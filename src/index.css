@@ -1,0 +1,88 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  background-color: #0b0d11;
+  color: #f4f1ea;
+}
+
+::selection {
+  background-color: rgba(197, 160, 89, 0.35);
+  color: #f4f1ea;
+}
+
+/* thin gilded scrollbar */
+::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+::-webkit-scrollbar-track {
+  background: #10141b;
+}
+::-webkit-scrollbar-thumb {
+  background: #262d3d;
+  border-radius: 9999px;
+  border: 2px solid #10141b;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #8f6c2c;
+}
+
+@layer utilities {
+  .text-shadow-gold {
+    text-shadow: 0 0 30px rgba(197, 160, 89, 0.25);
+  }
+
+  .bg-noise {
+    background-image: radial-gradient(rgba(197, 160, 89, 0.06) 1px, transparent 1px);
+    background-size: 3px 3px;
+  }
+
+  .fade-in {
+    animation: fadeIn 0.4s ease both;
+  }
+
+  .scale-in {
+    animation: scaleIn 0.35s cubic-bezier(0.16, 1, 0.3, 1) both;
+  }
+
+  .slide-up {
+    animation: slideUp 0.5s cubic-bezier(0.16, 1, 0.3, 1) both;
+  }
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes scaleIn {
+  from {
+    opacity: 0;
+    transform: scale(0.96);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@keyframes slideUp {
+  from {
+    opacity: 0;
+    transform: translateY(16px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
