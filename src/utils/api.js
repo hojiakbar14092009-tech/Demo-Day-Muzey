@@ -8,16 +8,21 @@ import { DEFAULT_EXHIBITS, seedId } from '../data/exhibits'
 const EXHIBITS_KEY = 'grand-musee-exhibits'
 const API_URL_KEY = 'grand-musee-api-url'
 
+const isBrowser = () => typeof window !== 'undefined'
+
 export function getApiUrl() {
+  if (!isBrowser()) return ''
   return localStorage.getItem(API_URL_KEY) || ''
 }
 
 export function setApiUrl(url) {
+  if (!isBrowser()) return
   if (url) localStorage.setItem(API_URL_KEY, url.trim())
   else localStorage.removeItem(API_URL_KEY)
 }
 
 function readLocal() {
+  if (!isBrowser()) return null
   try {
     const raw = localStorage.getItem(EXHIBITS_KEY)
     if (!raw) return null
@@ -28,6 +33,7 @@ function readLocal() {
 }
 
 function writeLocal(list) {
+  if (!isBrowser()) return
   localStorage.setItem(EXHIBITS_KEY, JSON.stringify(list))
 }
 

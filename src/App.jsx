@@ -1,8 +1,10 @@
+'use client'
+
 import { useEffect, useState } from 'react'
 import Navbar from './components/Navbar'
 import Footer from './components/Footer'
-import UserPage from './pages/UserPage'
-import AdminPage from './pages/AdminPage'
+import UserPage from './views/UserPage'
+import AdminPage from './views/AdminPage'
 import {
   loadExhibits,
   createExhibit,
