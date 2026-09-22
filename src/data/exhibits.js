@@ -1,7 +1,8 @@
 // Pre-seeded curatorial catalogue for Grand Musée.
-// Image URLs point to Wikimedia Commons' stable Special:FilePath redirector.
-
-const filePath = (name) => `https://commons.wikimedia.org/wiki/Special:FilePath/${name}`
+// Each exhibit carries a `wikiTitle` (its English Wikipedia article title)
+// instead of a hardcoded image URL — src/utils/wikiImage.js resolves the
+// real picture through Wikipedia's public API at load time, which is far
+// more reliable than guessing exact Wikimedia Commons filenames.
 
 export const MUSEUMS = [
   'Louvre',
@@ -34,7 +35,7 @@ export const DEFAULT_EXHIBITS = [
     medium: 'Oil on poplar panel',
     location: 'Denon Wing, Room 711',
     room: 'Salle des États',
-    image: filePath('Mona_Lisa.jpg'),
+    wikiTitle: 'Mona_Lisa',
     highlight: 'The most visited, most written about, and most parodied artwork in history.',
     description:
       'A half-length portrait of a poised woman whose ambiguous expression has captivated viewers for over five centuries.',
@@ -54,7 +55,7 @@ export const DEFAULT_EXHIBITS = [
     medium: 'Gold, lapis lazuli, carnelian, turquoise, obsidian, glass',
     location: 'Tutankhamun Galleries, Ground Floor',
     room: 'Treasures of the Boy King',
-    image: filePath('CairoEgMuseumTaaMaskMFA.jpg'),
+    wikiTitle: 'Mask_of_Tutankhamun',
     highlight: 'Eleven kilograms of solid gold, buried for over three thousand years.',
     description:
       "The funerary mask that covered the mummified head of the pharaoh Tutankhamun, regarded as the pinnacle of ancient Egyptian goldsmithing.",
@@ -74,7 +75,7 @@ export const DEFAULT_EXHIBITS = [
     medium: 'Granodiorite stele',
     location: 'Room 4, Egyptian Sculpture Gallery',
     room: 'Enlightenment Gallery',
-    image: filePath('Rosetta_Stone.JPG'),
+    wikiTitle: 'Rosetta_Stone',
     highlight: 'The trilingual key that unlocked the language of the pharaohs.',
     description:
       'A decree issued in Memphis, inscribed in three scripts — hieroglyphic, Demotic, and Ancient Greek — that became the key to deciphering Egyptian hieroglyphs.',
@@ -94,7 +95,7 @@ export const DEFAULT_EXHIBITS = [
     medium: 'Parian marble',
     location: 'Sully Wing, Ground Floor, Room 345',
     room: 'Galerie de la Vénus de Milo',
-    image: filePath('Venus_de_Milo_Louvre_Ma399_n4.jpg'),
+    wikiTitle: 'Venus_de_Milo',
     highlight: 'Armless for two centuries, and unmatched in serene classical beauty.',
     description:
       'A monumental marble depiction of Aphrodite, celebrated for its idealized form and the enduring mystery of its missing arms.',
@@ -114,7 +115,7 @@ export const DEFAULT_EXHIBITS = [
     medium: 'Oil on canvas',
     location: 'Fifth Floor, Gallery 502',
     room: 'Painting and Sculpture Galleries',
-    image: filePath('Van_Gogh_-_Starry_Night_-_Google_Art_Project.jpg'),
+    wikiTitle: 'The_Starry_Night',
     highlight: "Painted from memory, through the window of an asylum, at dawn.",
     description:
       "A swirling nocturnal vision of a village beneath a turbulent sky, painted during van Gogh's stay at the Saint-Rémy-de-Provence asylum.",
@@ -134,7 +135,7 @@ export const DEFAULT_EXHIBITS = [
     medium: 'Parian and Rhodian marble',
     location: 'Daru Staircase, Denon Wing',
     room: 'Escalier Daru',
-    image: filePath('Nike_of_Samothrake_Louvre.jpg'),
+    wikiTitle: 'Winged_Victory_of_Samothrace',
     highlight: 'A headless goddess of victory, frozen mid-flight against an imagined sea wind.',
     description:
       'A dramatic depiction of Nike, goddess of victory, alighting on the prow of a ship, her drapery rendered as if caught by ocean wind.',
@@ -154,7 +155,7 @@ export const DEFAULT_EXHIBITS = [
     medium: 'Aeolian sandstone',
     location: 'Sackler Wing, First Floor',
     room: 'The Sackler Wing',
-    image: filePath('Temple_of_Dendur_Met.jpg'),
+    wikiTitle: 'Temple_of_Dendur',
     highlight: 'An entire Nubian temple, dismantled stone by stone and gifted to New York.',
     description:
       'A sandstone temple built to honor the goddess Isis and two deified sons of a Nubian chieftain, reconstructed inside a glass-walled hall overlooking Central Park.',
@@ -174,7 +175,7 @@ export const DEFAULT_EXHIBITS = [
     medium: 'Woodblock print, ink and color on paper',
     location: 'Ukiyo-e Gallery, Honkan Building',
     room: 'Gallery of Japanese Prints',
-    image: filePath('Tsunami_by_hokusai_19th_century.jpg'),
+    wikiTitle: 'The_Great_Wave_off_Kanagawa',
     highlight: 'A towering wave, a distant Mount Fuji, and the most famous print ever made.',
     description:
       'The first print in Hokusai\'s series Thirty-six Views of Mount Fuji, depicting fishing boats dwarfed beneath a cresting wave with Fuji small in the distance.',
@@ -194,7 +195,7 @@ export const DEFAULT_EXHIBITS = [
     medium: 'Oil on canvas',
     location: 'Gallery of Honour, Night Watch Room',
     room: 'Eregalerij',
-    image: filePath('Rembrandt_van_Rijn_-_De_Nachtwacht_-_Google_Art_Project.jpg'),
+    wikiTitle: 'The_Night_Watch',
     highlight: 'A militia portrait reinvented as pure cinematic drama, drenched in shadow.',
     description:
       "A monumental group portrait of a civic militia company, captured in motion rather than static pose — a radical departure for the genre.",
@@ -214,7 +215,7 @@ export const DEFAULT_EXHIBITS = [
     medium: 'Gilded bronze, enamel, mechanical automaton',
     location: 'Pavilion Hall, Small Hermitage',
     room: 'Pavilion Hall',
-    image: filePath('Peacock_Clock_1.jpg'),
+    wikiTitle: 'Peacock_Clock',
     highlight: 'A gilded mechanical menagerie that still performs on command, over two centuries later.',
     description:
       'An extravagant automaton clock featuring a life-sized mechanical peacock, owl, rooster, and squirrel set within a gilded tree.',
@@ -234,7 +235,7 @@ export const DEFAULT_EXHIBITS = [
     medium: 'Lacquered iron, leather, silk lacing',
     location: 'Japanese Arms and Armor Gallery, Honkan',
     room: 'Gallery of Arms and Armor',
-    image: filePath('Gusoku_style_Armour.jpg'),
+    wikiTitle: 'Japanese_armour',
     highlight: 'Lacquered iron plates and silk lacing, engineered for both battle and ceremony.',
     description:
       'A complete gusoku-style suit of samurai armor combining articulated iron plates, lacquered finishes, and intricately knotted silk lacing.',
@@ -254,7 +255,7 @@ export const DEFAULT_EXHIBITS = [
     medium: 'White marble',
     location: 'Octagonal Court, Pio-Clementino Museum',
     room: 'Cortile Ottagono',
-    image: filePath('Laokoon-Gruppe.jpg'),
+    wikiTitle: 'Laocoön_and_His_Sons',
     highlight: 'A father and his sons, locked in a serpent\'s coils, sculpted in agonized perfection.',
     description:
       'A harrowing marble group depicting the Trojan priest Laocoön and his two sons being strangled by sea serpents, a punishment for warning Troy of the wooden horse.',
@@ -274,7 +275,7 @@ export const DEFAULT_EXHIBITS = [
     medium: 'Tempera on canvas',
     location: 'Room 10-14, Botticelli Rooms',
     room: 'Sala del Botticelli',
-    image: filePath('Sandro_Botticelli_-_La_nascita_di_Venere_-_Google_Art_Project_-_edited.jpg'),
+    wikiTitle: 'The_Birth_of_Venus',
     highlight: 'Venus rises from the sea on a scallop shell, blown ashore by the winds.',
     description:
       'A monumental mythological painting of the goddess Venus emerging fully grown from the sea foam, one of the defining images of the Renaissance.',
@@ -294,7 +295,7 @@ export const DEFAULT_EXHIBITS = [
     medium: 'Carrara marble',
     location: 'Tribune of the David',
     room: 'Tribuna del David',
-    image: filePath('David_von_Michelangelo.jpg'),
+    wikiTitle: 'David_(Michelangelo)',
     highlight: 'A five-meter marble giant, carved from a block every other sculptor had rejected.',
     description:
       'A colossal nude portrayal of the biblical hero David, poised before his battle with Goliath, celebrated as the pinnacle of Renaissance sculpture.',
@@ -314,7 +315,7 @@ export const DEFAULT_EXHIBITS = [
     medium: 'Limestone core with painted stucco',
     location: 'Room 2.10, Egyptian Courtyard',
     room: 'Nordkuppelsaal',
-    image: filePath('Nofretete_Neues_Museum.jpg'),
+    wikiTitle: 'Nefertiti_Bust',
     highlight: 'One of the most copied works of ancient Egypt, missing only its left eye.',
     description:
       'A painted limestone bust of Queen Nefertiti, prized for its symmetry and naturalism and regarded as an icon of ancient Egyptian art.',
@@ -334,7 +335,7 @@ export const DEFAULT_EXHIBITS = [
     medium: 'Basalt stele',
     location: 'Richelieu Wing, Room 227',
     room: 'Salle Babylone',
-    image: filePath('P1050763_Louvre_code_Hammurabi_face_rwk.JPG'),
+    wikiTitle: 'Code_of_Hammurabi',
     highlight: 'Nearly 300 laws carved in cuneiform, one of the earliest legal codes ever recorded.',
     description:
       'A towering basalt stele inscribed with one of the earliest and most complete written legal codes, issued by the Babylonian king Hammurabi.',
@@ -354,7 +355,7 @@ export const DEFAULT_EXHIBITS = [
     medium: 'Pentelic marble',
     location: 'Room 18, Duveen Gallery',
     room: 'Duveen Gallery',
-    image: filePath('Parthenon_Marbles_British_Museum.jpg'),
+    wikiTitle: 'Elgin_Marbles',
     highlight: 'Fragments of a frieze that once wrapped the Parthenon itself, high above Athens.',
     description:
       'A collection of marble sculptures and reliefs removed from the Parthenon and other structures on the Acropolis of Athens, depicting processions, battles, and mythological scenes.',
@@ -374,9 +375,7 @@ export const DEFAULT_EXHIBITS = [
     medium: 'Tempera and pastel on cardboard',
     location: 'Room 25, Modern Collection',
     room: 'Munch Room',
-    image: filePath(
-      'Edvard_Munch,_1893,_The_Scream,_oil,_tempera_and_pastel_on_cardboard,_91_x_73_cm,_National_Gallery_of_Norway.jpg'
-    ),
+    wikiTitle: 'The_Scream',
     highlight: 'A swirling, blood-red sky over a figure frozen in existential dread.',
     description:
       'An expressionist depiction of a figure gripping its face in anguish against a turbulent orange sky, widely read as an image of universal anxiety.',

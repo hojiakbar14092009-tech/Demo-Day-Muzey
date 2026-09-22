@@ -30,7 +30,7 @@ export default function ExhibitCard({ exhibit, index, size = 'normal', onOpen })
       </div>
 
       {/* image */}
-      {!imgError ? (
+      {exhibit.image && !imgError ? (
         <img
           src={exhibit.image}
           alt={exhibit.title}

@@ -161,7 +161,7 @@ export default function ExhibitModal({ exhibit, exhibits, onClose, onNavigate })
           <div className="pointer-events-none absolute inset-0 z-10 bg-[radial-gradient(circle_at_50%_20%,rgba(243,211,140,0.16),transparent_60%)]" />
 
           <div className="flex h-full w-full items-center justify-center overflow-hidden">
-            {!imgError ? (
+            {exhibit.image && !imgError ? (
               <img
                 src={exhibit.image}
                 alt={exhibit.title}

@@ -323,7 +323,7 @@ export default function AdminPage({
 
 function ExhibitThumb({ exhibit }) {
   const [error, setError] = useState(false)
-  if (error) {
+  if (error || !exhibit.image) {
     return <Landmark className="h-5 w-5 text-gold/40" strokeWidth={1.5} />
   }
   return (

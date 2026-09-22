@@ -13,6 +13,7 @@ import {
   getApiUrl,
   setApiUrl as persistApiUrl,
 } from './utils/api'
+import { resolveExhibitImages } from './utils/wikiImage'
 
 export default function App() {
   const [view, setView] = useState('user')
@@ -32,7 +33,8 @@ export default function App() {
   const refresh = async () => {
     setLoading(true)
     const result = await loadExhibits()
-    setExhibits(result.exhibits)
+    const withImages = await resolveExhibitImages(result.exhibits)
+    setExhibits(withImages)
     setSyncStatus(result)
     setLoading(false)
   }
@@ -54,7 +56,8 @@ export default function App() {
 
   const handleReset = async () => {
     const defaults = resetToDefaults()
-    setExhibits(defaults)
+    const withImages = await resolveExhibitImages(defaults)
+    setExhibits(withImages)
   }
 
   const handleApiUrlSave = (url) => {
