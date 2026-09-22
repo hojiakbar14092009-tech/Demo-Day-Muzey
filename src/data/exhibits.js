@@ -1,7 +1,7 @@
 // Pre-seeded curatorial catalogue for Grand Musée.
 // Image URLs point to Wikimedia Commons' stable Special:FilePath redirector.
 
-const filePath = (name) => `https://commons.wikimedia.org/wiki/Special:FilePath/${name}?width=1600`
+const filePath = (name) => `https://commons.wikimedia.org/wiki/Special:FilePath/${name}`
 
 export const MUSEUMS = [
   'Louvre',
@@ -13,6 +13,9 @@ export const MUSEUMS = [
   'Tokyo',
   'Vatican',
   'Rijksmuseum',
+  'Florence',
+  'Berlin',
+  'Oslo',
 ]
 
 export const CATEGORIES = ['Paintings', 'Sculptures', 'Antiques & Jewelry', 'Stone Inscriptions']
@@ -257,6 +260,128 @@ export const DEFAULT_EXHIBITS = [
       'A harrowing marble group depicting the Trojan priest Laocoön and his two sons being strangled by sea serpents, a punishment for warning Troy of the wooden horse.',
     history:
       "Praised by Pliny the Elder as superior to any painting or bronze, the sculpture was rediscovered in a Roman vineyard in 1506 and immediately purchased by Pope Julius II, guided in part by a young Michelangelo who examined it upon unearthing. Its anatomical intensity and theatrical suffering profoundly shaped Renaissance and Baroque sculpture, and it has remained in papal collections ever since.",
+  },
+  {
+    id: 'ex-13',
+    title: 'The Birth of Venus',
+    artist: 'Sandro Botticelli',
+    year: 'c. 1485',
+    period: 'Italian Renaissance',
+    museum: 'Florence',
+    museumFull: 'Uffizi Gallery, Florence',
+    category: 'Paintings',
+    dimensions: '172.5 cm × 278.9 cm',
+    medium: 'Tempera on canvas',
+    location: 'Room 10-14, Botticelli Rooms',
+    room: 'Sala del Botticelli',
+    image: filePath('Sandro_Botticelli_-_La_nascita_di_Venere_-_Google_Art_Project_-_edited.jpg'),
+    highlight: 'Venus rises from the sea on a scallop shell, blown ashore by the winds.',
+    description:
+      'A monumental mythological painting of the goddess Venus emerging fully grown from the sea foam, one of the defining images of the Renaissance.',
+    history:
+      "Commissioned by the Medici family, Botticelli's painting broke from religious convention by depicting a large-scale nude mythological figure, drawing on classical poetry and sculpture for its pose. It has hung in the Uffizi since the gallery's founding and remains one of the most reproduced paintings in the world.",
+  },
+  {
+    id: 'ex-14',
+    title: 'David',
+    artist: 'Michelangelo',
+    year: '1501–1504',
+    period: 'Italian Renaissance',
+    museum: 'Florence',
+    museumFull: 'Galleria dell\'Accademia, Florence',
+    category: 'Sculptures',
+    dimensions: '517 cm height',
+    medium: 'Carrara marble',
+    location: 'Tribune of the David',
+    room: 'Tribuna del David',
+    image: filePath('David_von_Michelangelo.jpg'),
+    highlight: 'A five-meter marble giant, carved from a block every other sculptor had rejected.',
+    description:
+      'A colossal nude portrayal of the biblical hero David, poised before his battle with Goliath, celebrated as the pinnacle of Renaissance sculpture.',
+    history:
+      "Carved from a single block of marble that had sat unused for decades after two earlier sculptors abandoned it, Michelangelo completed David at just 26 years old. Originally intended for the roofline of Florence Cathedral, it was instead installed in the Piazza della Signoria as a civic symbol before being moved indoors to the Accademia in 1873 to protect it from the elements.",
+  },
+  {
+    id: 'ex-15',
+    title: 'Bust of Nefertiti',
+    artist: 'Thutmose',
+    year: 'c. 1345 BCE',
+    period: 'New Kingdom, 18th Dynasty',
+    museum: 'Berlin',
+    museumFull: 'Neues Museum, Berlin',
+    category: 'Antiques & Jewelry',
+    dimensions: '48 cm height',
+    medium: 'Limestone core with painted stucco',
+    location: 'Room 2.10, Egyptian Courtyard',
+    room: 'Nordkuppelsaal',
+    image: filePath('Nofretete_Neues_Museum.jpg'),
+    highlight: 'One of the most copied works of ancient Egypt, missing only its left eye.',
+    description:
+      'A painted limestone bust of Queen Nefertiti, prized for its symmetry and naturalism and regarded as an icon of ancient Egyptian art.',
+    history:
+      "Discovered in 1912 by German archaeologist Ludwig Borchardt in the workshop of the sculptor Thutmose at Amarna, the bust likely served as a master model for other portraits of the queen. Its ownership has been disputed by Egypt for decades, but it has remained on display in Berlin since entering the Neues Museum's collection, missing only the inlay of its left eye.",
+  },
+  {
+    id: 'ex-16',
+    title: 'Code of Hammurabi',
+    artist: 'Babylonian Scribes',
+    year: 'c. 1754 BCE',
+    period: 'Old Babylonian Empire',
+    museum: 'Louvre',
+    museumFull: 'Musée du Louvre, Paris',
+    category: 'Stone Inscriptions',
+    dimensions: '225 cm height',
+    medium: 'Basalt stele',
+    location: 'Richelieu Wing, Room 227',
+    room: 'Salle Babylone',
+    image: filePath('P1050763_Louvre_code_Hammurabi_face_rwk.JPG'),
+    highlight: 'Nearly 300 laws carved in cuneiform, one of the earliest legal codes ever recorded.',
+    description:
+      'A towering basalt stele inscribed with one of the earliest and most complete written legal codes, issued by the Babylonian king Hammurabi.',
+    history:
+      "Rediscovered in 1901 by French archaeologists at Susa, in present-day Iran, the stele had been carried off by Elamite raiders in antiquity as war plunder. Its nearly 300 laws, covering trade, family, and criminal justice, are capped by a relief of Hammurabi receiving his authority from the seated sun god Shamash, and it remains a foundational document in the history of law.",
+  },
+  {
+    id: 'ex-17',
+    title: 'Parthenon Marbles',
+    artist: 'Workshop of Phidias',
+    year: 'c. 447–432 BCE',
+    period: 'Classical Greece',
+    museum: 'British',
+    museumFull: 'The British Museum, London',
+    category: 'Sculptures',
+    dimensions: 'Frieze fragments, various sizes',
+    medium: 'Pentelic marble',
+    location: 'Room 18, Duveen Gallery',
+    room: 'Duveen Gallery',
+    image: filePath('Parthenon_Marbles_British_Museum.jpg'),
+    highlight: 'Fragments of a frieze that once wrapped the Parthenon itself, high above Athens.',
+    description:
+      'A collection of marble sculptures and reliefs removed from the Parthenon and other structures on the Acropolis of Athens, depicting processions, battles, and mythological scenes.',
+    history:
+      "Removed from the Acropolis in the early 19th century under the direction of Lord Elgin, then British ambassador to the Ottoman Empire, the marbles were sold to the British Museum in 1816. Their presence in London rather than Athens remains one of the most prominent disputes in the world of cultural heritage, with Greece continuing to campaign for their return.",
+  },
+  {
+    id: 'ex-18',
+    title: 'The Scream',
+    artist: 'Edvard Munch',
+    year: '1893',
+    period: 'Expressionism',
+    museum: 'Oslo',
+    museumFull: 'National Museum of Norway, Oslo',
+    category: 'Paintings',
+    dimensions: '91 cm × 73.5 cm',
+    medium: 'Tempera and pastel on cardboard',
+    location: 'Room 25, Modern Collection',
+    room: 'Munch Room',
+    image: filePath(
+      'Edvard_Munch,_1893,_The_Scream,_oil,_tempera_and_pastel_on_cardboard,_91_x_73_cm,_National_Gallery_of_Norway.jpg'
+    ),
+    highlight: 'A swirling, blood-red sky over a figure frozen in existential dread.',
+    description:
+      'An expressionist depiction of a figure gripping its face in anguish against a turbulent orange sky, widely read as an image of universal anxiety.',
+    history:
+      "Munch described the inspiration for The Scream as a moment of sudden dread felt while walking at sunset, when he sensed 'an infinite scream passing through nature.' He produced several versions in different media; this tempera version has twice been stolen from Norwegian museums and recovered, only adding to its notoriety as one of the most instantly recognizable images in art history.",
   },
 ]
 
