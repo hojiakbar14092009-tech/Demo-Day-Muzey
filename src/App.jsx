@@ -1,7 +1,6 @@
 import { useEffect, useState } from 'react'
 import Navbar from './components/Navbar'
 import Footer from './components/Footer'
-import AdminLogin from './components/AdminLogin'
 import UserPage from './pages/UserPage'
 import AdminPage from './pages/AdminPage'
 import {
@@ -20,9 +19,6 @@ export default function App() {
   const [loading, setLoading] = useState(true)
   const [apiUrl, setApiUrlState] = useState(getApiUrl())
   const [syncStatus, setSyncStatus] = useState({ source: 'local' })
-  const [isAdminAuthed, setIsAdminAuthed] = useState(
-    sessionStorage.getItem('grand-musee-admin-auth') === 'true'
-  )
 
   useEffect(() => {
     refresh()
@@ -63,25 +59,9 @@ export default function App() {
     refresh()
   }
 
-  const handleLogin = () => {
-    sessionStorage.setItem('grand-musee-admin-auth', 'true')
-    setIsAdminAuthed(true)
-  }
-
-  const handleLogout = () => {
-    sessionStorage.removeItem('grand-musee-admin-auth')
-    setIsAdminAuthed(false)
-    setView('user')
-  }
-
   return (
     <div className="min-h-screen bg-obsidian font-sans text-parchment">
-      <Navbar
-        view={view}
-        setView={setView}
-        isAdminAuthed={isAdminAuthed}
-        onLogout={handleLogout}
-      />
+      <Navbar view={view} setView={setView} />
 
       {loading ? (
         <div className="flex min-h-[60vh] items-center justify-center">
@@ -91,8 +71,6 @@ export default function App() {
         </div>
       ) : view === 'user' ? (
         <UserPage exhibits={exhibits} />
-      ) : !isAdminAuthed ? (
-        <AdminLogin onLogin={handleLogin} />
       ) : (
         <AdminPage
           exhibits={exhibits}
