@@ -1,6 +1,6 @@
-import { Landmark, Users, ShieldCheck } from 'lucide-react'
+import { Landmark, Users, ShieldCheck, LogOut } from 'lucide-react'
 
-export default function Navbar({ view, setView }) {
+export default function Navbar({ view, setView, isAdminAuthed, onLogout }) {
   return (
     <header className="sticky top-0 z-40 border-b border-frame bg-obsidian/90 backdrop-blur-md">
       <div className="mx-auto flex max-w-7xl items-center justify-between px-5 py-4 sm:px-8">
@@ -18,30 +18,42 @@ export default function Navbar({ view, setView }) {
           </div>
         </div>
 
-        <nav className="flex items-center gap-1 rounded-full border border-frame bg-slate/60 p-1">
-          <button
-            onClick={() => setView('user')}
-            className={`flex items-center gap-2 rounded-full px-3 py-2 font-sans text-xs uppercase tracking-widest transition-all sm:px-5 ${
-              view === 'user'
-                ? 'bg-gold text-obsidian shadow-gilded'
-                : 'text-alabaster/70 hover:text-gold-light'
-            }`}
-          >
-            <Users className="h-3.5 w-3.5" strokeWidth={1.75} />
-            <span className="hidden sm:inline">Muzey Zali</span>
-          </button>
-          <button
-            onClick={() => setView('admin')}
-            className={`flex items-center gap-2 rounded-full px-3 py-2 font-sans text-xs uppercase tracking-widest transition-all sm:px-5 ${
-              view === 'admin'
-                ? 'bg-gold text-obsidian shadow-gilded'
-                : 'text-alabaster/70 hover:text-gold-light'
-            }`}
-          >
-            <ShieldCheck className="h-3.5 w-3.5" strokeWidth={1.75} />
-            <span className="hidden sm:inline">Admin Panel</span>
-          </button>
-        </nav>
+        <div className="flex items-center gap-3">
+          <nav className="flex items-center gap-1 rounded-full border border-frame bg-slate/60 p-1">
+            <button
+              onClick={() => setView('user')}
+              className={`flex items-center gap-2 rounded-full px-3 py-2 font-sans text-xs uppercase tracking-widest transition-all sm:px-5 ${
+                view === 'user'
+                  ? 'bg-gold text-obsidian shadow-gilded'
+                  : 'text-alabaster/70 hover:text-gold-light'
+              }`}
+            >
+              <Users className="h-3.5 w-3.5" strokeWidth={1.75} />
+              <span className="hidden sm:inline">Muzey Zali</span>
+            </button>
+            <button
+              onClick={() => setView('admin')}
+              className={`flex items-center gap-2 rounded-full px-3 py-2 font-sans text-xs uppercase tracking-widest transition-all sm:px-5 ${
+                view === 'admin'
+                  ? 'bg-gold text-obsidian shadow-gilded'
+                  : 'text-alabaster/70 hover:text-gold-light'
+              }`}
+            >
+              <ShieldCheck className="h-3.5 w-3.5" strokeWidth={1.75} />
+              <span className="hidden sm:inline">Admin</span>
+            </button>
+          </nav>
+
+          {view === 'admin' && isAdminAuthed && (
+            <button
+              onClick={onLogout}
+              className="flex items-center gap-2 rounded-full border border-frame px-3 py-2 font-sans text-xs uppercase tracking-widest text-alabaster/60 transition-colors hover:border-gold hover:text-gold-light"
+            >
+              <LogOut className="h-3.5 w-3.5" strokeWidth={1.75} />
+              <span className="hidden sm:inline">Log Out</span>
+            </button>
+          )}
+        </div>
       </div>
     </header>
   )
