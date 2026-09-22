@@ -14,8 +14,10 @@ import {
   setApiUrl as persistApiUrl,
 } from './utils/api'
 import { resolveExhibitImages } from './utils/wikiImage'
+import { useLanguage } from './i18n/LanguageContext'
 
 export default function App() {
+  const { t } = useLanguage()
   const [view, setView] = useState('user')
   const [exhibits, setExhibits] = useState([])
   const [loading, setLoading] = useState(true)
@@ -89,7 +91,7 @@ export default function App() {
       {loading ? (
         <div className="flex min-h-[60vh] items-center justify-center">
           <p className="font-display text-sm uppercase tracking-widest text-gold/60">
-            Opening the galleries…
+            {t.gallery.loading}
           </p>
         </div>
       ) : view === 'user' ? (

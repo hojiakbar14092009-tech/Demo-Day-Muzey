@@ -11,8 +11,11 @@ import {
   MapPin,
   Landmark,
 } from 'lucide-react'
+import { useLanguage } from '../i18n/LanguageContext'
+import { CATEGORY_LABELS } from '../i18n/translations'
 
 export default function ExhibitModal({ exhibit, exhibits, onClose, onNavigate }) {
+  const { lang, t } = useLanguage()
   const [zoom, setZoom] = useState(1)
   const [imgError, setImgError] = useState(false)
   const [audioPlaying, setAudioPlaying] = useState(false)
@@ -56,7 +59,7 @@ export default function ExhibitModal({ exhibit, exhibits, onClose, onNavigate })
         {/* LEFT: curatorial detail */}
         <div className="order-2 flex max-h-[92vh] flex-col overflow-y-auto p-6 sm:p-8 md:order-1">
           <span className="font-display text-xs tracking-widest text-gold">
-            № {String(index + 1).padStart(2, '0')} · {exhibit.category}
+            № {String(index + 1).padStart(2, '0')} · {CATEGORY_LABELS[lang][exhibit.category]}
           </span>
           <h2 className="mt-3 font-display text-3xl leading-tight text-parchment sm:text-4xl">
             {exhibit.title}
@@ -75,7 +78,7 @@ export default function ExhibitModal({ exhibit, exhibits, onClose, onNavigate })
               <Volume2 className="h-4 w-4 text-gold-light" strokeWidth={1.75} />
             )}
             <span className="font-sans text-xs uppercase tracking-widest text-alabaster/80">
-              {audioPlaying ? 'Playing Audio Guide…' : 'Play Audio Guide'}
+              {audioPlaying ? t.modal.playingAudio : t.modal.playAudio}
             </span>
             {audioPlaying && (
               <span className="flex items-end gap-0.5">
@@ -96,7 +99,7 @@ export default function ExhibitModal({ exhibit, exhibits, onClose, onNavigate })
 
           <div className="mt-6 border-l-2 border-gold/40 pl-4">
             <p className="font-display text-xs uppercase tracking-widest text-gold/80">
-              Historical Narrative
+              {t.modal.historicalNarrative}
             </p>
             <p className="mt-2 font-serif text-[15px] leading-relaxed text-alabaster/80">
               {exhibit.history}
@@ -108,7 +111,7 @@ export default function ExhibitModal({ exhibit, exhibits, onClose, onNavigate })
               <Ruler className="mt-0.5 h-4 w-4 shrink-0 text-gold/70" strokeWidth={1.5} />
               <div>
                 <p className="font-sans text-[10px] uppercase tracking-widest text-alabaster/50">
-                  Dimensions
+                  {t.modal.dimensions}
                 </p>
                 <p className="font-sans text-sm text-alabaster/90">{exhibit.dimensions}</p>
               </div>
@@ -117,7 +120,7 @@ export default function ExhibitModal({ exhibit, exhibits, onClose, onNavigate })
               <Landmark className="mt-0.5 h-4 w-4 shrink-0 text-gold/70" strokeWidth={1.5} />
               <div>
                 <p className="font-sans text-[10px] uppercase tracking-widest text-alabaster/50">
-                  Medium
+                  {t.modal.medium}
                 </p>
                 <p className="font-sans text-sm text-alabaster/90">{exhibit.medium}</p>
               </div>
@@ -126,7 +129,7 @@ export default function ExhibitModal({ exhibit, exhibits, onClose, onNavigate })
               <MapPin className="mt-0.5 h-4 w-4 shrink-0 text-gold/70" strokeWidth={1.5} />
               <div>
                 <p className="font-sans text-[10px] uppercase tracking-widest text-alabaster/50">
-                  Provenance &amp; Current Location
+                  {t.modal.provenance}
                 </p>
                 <p className="font-sans text-sm text-alabaster/90">
                   {exhibit.museumFull} — {exhibit.location}
@@ -141,7 +144,7 @@ export default function ExhibitModal({ exhibit, exhibits, onClose, onNavigate })
               className="flex items-center gap-2 font-sans text-xs uppercase tracking-widest text-alabaster/70 transition-colors hover:text-gold-light"
             >
               <ChevronLeft className="h-4 w-4" strokeWidth={1.75} />
-              Previous
+              {t.modal.previous}
             </button>
             <span className="font-display text-xs text-gold/60">
               {index + 1} / {exhibits.length}
@@ -150,7 +153,7 @@ export default function ExhibitModal({ exhibit, exhibits, onClose, onNavigate })
               onClick={() => onNavigate(1)}
               className="flex items-center gap-2 font-sans text-xs uppercase tracking-widest text-alabaster/70 transition-colors hover:text-gold-light"
             >
-              Next
+              {t.modal.next}
               <ChevronRight className="h-4 w-4" strokeWidth={1.75} />
             </button>
           </div>

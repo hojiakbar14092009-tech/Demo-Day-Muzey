@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useMemo, useState } from 'react'
 import {
   Plus,
   Pencil,
@@ -13,6 +13,9 @@ import {
   Landmark,
 } from 'lucide-react'
 import { MUSEUMS, CATEGORIES } from '../data/exhibits'
+import { localizeExhibits } from '../utils/localize'
+import { useLanguage } from '../i18n/LanguageContext'
+import { CATEGORY_LABELS, MUSEUM_LABELS } from '../i18n/translations'
 
 const EMPTY_FORM = {
   title: '',
@@ -42,6 +45,9 @@ export default function AdminPage({
   onApiUrlSave,
   syncStatus,
 }) {
+  const { lang, t } = useLanguage()
+  const localized = useMemo(() => localizeExhibits(exhibits, lang), [exhibits, lang])
+
   const [form, setForm] = useState(EMPTY_FORM)
   const [editingId, setEditingId] = useState(null)
   const [apiInput, setApiInput] = useState(apiUrl || '')
@@ -83,13 +89,13 @@ export default function AdminPage({
   }
 
   const handleDelete = async (id) => {
-    if (!window.confirm('Remove this exhibit from the collection?')) return
+    if (!window.confirm(t.admin.confirmDelete)) return
     await onDelete(id)
     if (editingId === id) cancelEdit()
   }
 
   const handleReset = async () => {
-    if (!window.confirm('Reset the collection to the original 12 masterpieces? This cannot be undone.')) return
+    if (!window.confirm(t.admin.confirmReset)) return
     await onReset()
     cancelEdit()
   }
@@ -103,12 +109,10 @@ export default function AdminPage({
     <div className="mx-auto max-w-7xl px-6 py-14 sm:px-8">
       <div className="mb-10 text-center">
         <p className="font-sans text-[11px] uppercase tracking-[0.4em] text-gold">
-          Curator Access
+          {t.admin.kicker}
         </p>
-        <h1 className="mt-3 font-display text-3xl text-parchment sm:text-4xl">Admin Panel</h1>
-        <p className="mt-3 font-serif text-alabaster/60">
-          Manage the permanent collection — add, revise, or retire exhibits.
-        </p>
+        <h1 className="mt-3 font-display text-3xl text-parchment sm:text-4xl">{t.admin.title}</h1>
+        <p className="mt-3 font-serif text-alabaster/60">{t.admin.subtitle}</p>
       </div>
 
       {/* MockAPI sync */}
@@ -116,7 +120,7 @@ export default function AdminPage({
         <div className="mb-4 flex items-center gap-2">
           <Database className="h-4 w-4 text-gold" strokeWidth={1.75} />
           <h2 className="font-display text-sm uppercase tracking-widest text-gold-light">
-            MockAPI.io Sync
+            {t.admin.mockApiSync}
           </h2>
         </div>
         <form onSubmit={handleApiSave} className="flex flex-col gap-3 sm:flex-row">
@@ -130,28 +134,24 @@ export default function AdminPage({
             type="submit"
             className="rounded-md border border-gold bg-gold px-5 py-2.5 font-sans text-xs uppercase tracking-widest text-obsidian transition-opacity hover:opacity-90"
           >
-            Save Endpoint
+            {t.admin.saveEndpoint}
           </button>
         </form>
         <div className="mt-3 flex items-center gap-2 font-sans text-xs">
           {syncStatus?.source === 'api' ? (
             <>
               <CheckCircle2 className="h-3.5 w-3.5 text-emerald-400" strokeWidth={2} />
-              <span className="text-emerald-400/90">Synced live with MockAPI endpoint.</span>
+              <span className="text-emerald-400/90">{t.admin.syncedLive}</span>
             </>
           ) : apiUrl ? (
             <>
               <AlertCircle className="h-3.5 w-3.5 text-amber-400" strokeWidth={2} />
-              <span className="text-amber-400/90">
-                Endpoint unreachable — running on local storage fallback.
-              </span>
+              <span className="text-amber-400/90">{t.admin.endpointUnreachable}</span>
             </>
           ) : (
             <>
               <AlertCircle className="h-3.5 w-3.5 text-alabaster/40" strokeWidth={2} />
-              <span className="text-alabaster/50">
-                No endpoint configured — using local storage only.
-              </span>
+              <span className="text-alabaster/50">{t.admin.noEndpoint}</span>
             </>
           )}
         </div>
@@ -165,7 +165,7 @@ export default function AdminPage({
         >
           <div className="flex items-center justify-between">
             <h2 className="font-display text-sm uppercase tracking-widest text-gold-light">
-              {editingId ? 'Edit Exhibit' : 'Add New Exhibit'}
+              {editingId ? t.admin.editExhibit : t.admin.addNew}
             </h2>
             {editingId && (
               <button
@@ -174,7 +174,7 @@ export default function AdminPage({
                 className="flex items-center gap-1 font-sans text-[11px] text-alabaster/50 hover:text-gold-light"
               >
                 <X className="h-3 w-3" strokeWidth={2} />
-                Cancel
+                {t.admin.cancel}
               </button>
             )}
           </div>
@@ -191,63 +191,65 @@ export default function AdminPage({
             ) : (
               <div className="flex flex-col items-center gap-2 text-alabaster/30">
                 <ImageIcon className="h-6 w-6" strokeWidth={1.5} />
-                <span className="font-sans text-[11px]">Live image preview</span>
+                <span className="font-sans text-[11px]">{t.admin.livePreview}</span>
               </div>
             )}
           </div>
 
-          <Field label="Image URL" value={form.image} onChange={updateField('image')} required />
+          <Field label={t.admin.fields.imageUrl} value={form.image} onChange={updateField('image')} required />
           <div className="grid grid-cols-2 gap-3">
-            <Field label="Title" value={form.title} onChange={updateField('title')} required />
-            <Field label="Artist" value={form.artist} onChange={updateField('artist')} required />
+            <Field label={t.admin.fields.title} value={form.title} onChange={updateField('title')} required />
+            <Field label={t.admin.fields.artist} value={form.artist} onChange={updateField('artist')} required />
           </div>
           <div className="grid grid-cols-2 gap-3">
-            <Field label="Year" value={form.year} onChange={updateField('year')} />
-            <Field label="Period" value={form.period} onChange={updateField('period')} />
+            <Field label={t.admin.fields.year} value={form.year} onChange={updateField('year')} />
+            <Field label={t.admin.fields.period} value={form.period} onChange={updateField('period')} />
           </div>
 
           <div className="grid grid-cols-2 gap-3">
             <SelectField
-              label="Museum"
+              label={t.admin.fields.museum}
               value={form.museum}
               onChange={updateField('museum')}
               options={MUSEUMS}
+              optionLabels={MUSEUM_LABELS[lang]}
             />
             <SelectField
-              label="Category"
+              label={t.admin.fields.category}
               value={form.category}
               onChange={updateField('category')}
               options={CATEGORIES}
+              optionLabels={CATEGORY_LABELS[lang]}
             />
           </div>
 
           <Field
-            label="Museum Full Name"
+            label={t.admin.fields.museumFull}
             value={form.museumFull}
             onChange={updateField('museumFull')}
           />
           <div className="grid grid-cols-2 gap-3">
-            <Field label="Dimensions" value={form.dimensions} onChange={updateField('dimensions')} />
-            <Field label="Medium" value={form.medium} onChange={updateField('medium')} />
+            <Field label={t.admin.fields.dimensions} value={form.dimensions} onChange={updateField('dimensions')} />
+            <Field label={t.admin.fields.medium} value={form.medium} onChange={updateField('medium')} />
           </div>
           <div className="grid grid-cols-2 gap-3">
-            <Field label="Gallery Location" value={form.location} onChange={updateField('location')} />
-            <Field label="Room" value={form.room} onChange={updateField('room')} />
+            <Field label={t.admin.fields.location} value={form.location} onChange={updateField('location')} />
+            <Field label={t.admin.fields.room} value={form.room} onChange={updateField('room')} />
           </div>
           <Field
-            label="Curatorial Teaser"
+            label={t.admin.fields.teaser}
             value={form.highlight}
             onChange={updateField('highlight')}
             textarea
           />
           <Field
-            label="Description"
+            label={t.admin.fields.description}
             value={form.description}
             onChange={updateField('description')}
             textarea
           />
           <Field
-            label="Historical Narrative"
+            label={t.admin.fields.history}
             value={form.history}
             onChange={updateField('history')}
             textarea
@@ -259,7 +261,7 @@ export default function AdminPage({
             className="mt-2 flex items-center justify-center gap-2 rounded-md border border-gold bg-gold py-3 font-sans text-xs uppercase tracking-widest text-obsidian transition-opacity hover:opacity-90 disabled:opacity-50"
           >
             {editingId ? <Save className="h-4 w-4" strokeWidth={2} /> : <Plus className="h-4 w-4" strokeWidth={2} />}
-            {editingId ? 'Save Changes' : 'Add Exhibit'}
+            {editingId ? t.admin.saveChanges : t.admin.addExhibit}
           </button>
         </form>
 
@@ -267,19 +269,19 @@ export default function AdminPage({
         <div className="lg:col-span-3">
           <div className="mb-4 flex items-center justify-between">
             <p className="font-sans text-xs uppercase tracking-widest text-alabaster/50">
-              {exhibits.length} exhibits in collection
+              {exhibits.length} {t.admin.exhibitsInCollection}
             </p>
             <button
               onClick={handleReset}
               className="flex items-center gap-2 rounded-full border border-frame px-4 py-2 font-sans text-[11px] uppercase tracking-widest text-alabaster/60 transition-colors hover:border-gold hover:text-gold-light"
             >
               <RotateCcw className="h-3.5 w-3.5" strokeWidth={1.75} />
-              Reset to Defaults
+              {t.admin.resetToDefaults}
             </button>
           </div>
 
           <div className="flex flex-col gap-3">
-            {exhibits.map((exhibit, i) => (
+            {localized.map((exhibit, i) => (
               <div
                 key={exhibit.id}
                 className="flex items-center gap-4 rounded-sm border border-frame bg-slate/30 p-3"
@@ -311,7 +313,7 @@ export default function AdminPage({
             ))}
             {exhibits.length === 0 && (
               <p className="py-10 text-center font-sans text-sm text-alabaster/40">
-                No exhibits yet — add one on the left.
+                {t.admin.noExhibitsYet}
               </p>
             )}
           </div>
@@ -362,7 +364,7 @@ function Field({ label, value, onChange, required, textarea }) {
   )
 }
 
-function SelectField({ label, value, onChange, options }) {
+function SelectField({ label, value, onChange, options, optionLabels }) {
   return (
     <label className="flex flex-col gap-1">
       <span className="font-sans text-[10px] uppercase tracking-widest text-alabaster/50">
@@ -375,7 +377,7 @@ function SelectField({ label, value, onChange, options }) {
       >
         {options.map((opt) => (
           <option key={opt} value={opt}>
-            {opt}
+            {optionLabels ? optionLabels[opt] : opt}
           </option>
         ))}
       </select>

@@ -5,20 +5,26 @@ import ExhibitCard from '../components/ExhibitCard'
 import ExhibitModal from '../components/ExhibitModal'
 import Pagination from '../components/Pagination'
 import { MUSEUMS, CATEGORIES } from '../data/exhibits'
+import { localizeExhibits } from '../utils/localize'
+import { useLanguage } from '../i18n/LanguageContext'
+import { CATEGORY_LABELS, MUSEUM_LABELS } from '../i18n/translations'
 
 const PAGE_SIZE = 6
 const SIZE_PATTERN = ['tall', 'normal', 'wide', 'normal', 'tall', 'wide']
 
 export default function UserPage({ exhibits }) {
+  const { lang, t } = useLanguage()
   const [query, setQuery] = useState('')
   const [museumFilter, setMuseumFilter] = useState('All')
   const [categoryFilter, setCategoryFilter] = useState('All')
   const [page, setPage] = useState(1)
   const [selected, setSelected] = useState(null)
 
+  const localized = useMemo(() => localizeExhibits(exhibits, lang), [exhibits, lang])
+
   const filtered = useMemo(() => {
     const q = query.trim().toLowerCase()
-    return exhibits.filter((ex) => {
+    return localized.filter((ex) => {
       const matchesQuery =
         !q ||
         ex.title.toLowerCase().includes(q) ||
@@ -29,7 +35,7 @@ export default function UserPage({ exhibits }) {
       const matchesCategory = categoryFilter === 'All' || ex.category === categoryFilter
       return matchesQuery && matchesMuseum && matchesCategory
     })
-  }, [exhibits, query, museumFilter, categoryFilter])
+  }, [localized, query, museumFilter, categoryFilter])
 
   useEffect(() => {
     setPage(1)
@@ -70,7 +76,7 @@ export default function UserPage({ exhibits }) {
           <input
             value={query}
             onChange={(e) => setQuery(e.target.value)}
-            placeholder="Search by artwork, artist, museum, or era…"
+            placeholder={t.search.placeholder}
             className="w-full rounded-full border border-frame bg-slate/60 py-3.5 pl-11 pr-4 font-sans text-sm text-parchment placeholder:text-alabaster/40 focus:border-gold focus:outline-none focus:ring-1 focus:ring-gold/40"
           />
         </div>
@@ -87,7 +93,7 @@ export default function UserPage({ exhibits }) {
                   : 'border-frame text-alabaster/60 hover:border-gold/60 hover:text-gold-light'
               }`}
             >
-              {m}
+              {m === 'All' ? t.search.all : MUSEUM_LABELS[lang][m]}
             </button>
           ))}
         </div>
@@ -107,7 +113,7 @@ export default function UserPage({ exhibits }) {
                   : 'border-frame text-alabaster/50 hover:border-gold/50 hover:text-gold-light'
               }`}
             >
-              {c}
+              {c === 'All' ? t.search.all : CATEGORY_LABELS[lang][c]}
             </button>
           ))}
           {hasActiveFilters && (
@@ -116,7 +122,7 @@ export default function UserPage({ exhibits }) {
               className="flex items-center gap-1 rounded-full border border-frame px-3 py-1.5 font-sans text-[11px] text-alabaster/50 transition-colors hover:border-gold hover:text-gold-light"
             >
               <X className="h-3 w-3" strokeWidth={2} />
-              Clear
+              {t.search.clear}
             </button>
           )}
         </div>
@@ -136,10 +142,8 @@ export default function UserPage({ exhibits }) {
           </div>
         ) : (
           <div className="flex flex-col items-center gap-3 py-20 text-center">
-            <p className="font-display text-xl text-gold-light">No exhibits found</p>
-            <p className="font-sans text-sm text-alabaster/50">
-              Try adjusting your search or filters.
-            </p>
+            <p className="font-display text-xl text-gold-light">{t.gallery.noResultsTitle}</p>
+            <p className="font-sans text-sm text-alabaster/50">{t.gallery.noResultsBody}</p>
           </div>
         )}
 

@@ -1,10 +1,12 @@
 import { useState } from 'react'
 import { ShieldCheck, Lock, User, AlertCircle } from 'lucide-react'
+import { useLanguage } from '../i18n/LanguageContext'
 
 export const ADMIN_USERNAME = 'admin'
 export const ADMIN_PASSWORD = 'muzey2026'
 
 export default function AdminLogin({ onLogin }) {
+  const { t } = useLanguage()
   const [username, setUsername] = useState('')
   const [password, setPassword] = useState('')
   const [error, setError] = useState('')
@@ -15,7 +17,7 @@ export default function AdminLogin({ onLogin }) {
       setError('')
       onLogin()
     } else {
-      setError('Login yoki parol noto\'g\'ri.')
+      setError(t.login.error)
     }
   }
 
@@ -24,16 +26,14 @@ export default function AdminLogin({ onLogin }) {
       <div className="mb-6 flex h-14 w-14 items-center justify-center rounded-full border border-gold/40 bg-slate/60">
         <ShieldCheck className="h-6 w-6 text-gold-light" strokeWidth={1.5} />
       </div>
-      <p className="font-sans text-[11px] uppercase tracking-[0.4em] text-gold">Curator Access</p>
-      <h1 className="mt-3 text-center font-display text-3xl text-parchment">Admin Login</h1>
-      <p className="mt-3 text-center font-serif text-alabaster/60">
-        Enter your credentials to manage the collection.
-      </p>
+      <p className="font-sans text-[11px] uppercase tracking-[0.4em] text-gold">{t.login.kicker}</p>
+      <h1 className="mt-3 text-center font-display text-3xl text-parchment">{t.login.title}</h1>
+      <p className="mt-3 text-center font-serif text-alabaster/60">{t.login.subtitle}</p>
 
       <form onSubmit={handleSubmit} className="mt-8 flex w-full flex-col gap-4">
         <label className="flex flex-col gap-1">
           <span className="font-sans text-[10px] uppercase tracking-widest text-alabaster/50">
-            Username
+            {t.login.username}
           </span>
           <div className="flex items-center gap-2 rounded-md border border-frame bg-obsidian/60 px-3 py-2.5">
             <User className="h-4 w-4 text-gold/60" strokeWidth={1.75} />
@@ -48,7 +48,7 @@ export default function AdminLogin({ onLogin }) {
 
         <label className="flex flex-col gap-1">
           <span className="font-sans text-[10px] uppercase tracking-widest text-alabaster/50">
-            Password
+            {t.login.password}
           </span>
           <div className="flex items-center gap-2 rounded-md border border-frame bg-obsidian/60 px-3 py-2.5">
             <Lock className="h-4 w-4 text-gold/60" strokeWidth={1.75} />
@@ -72,7 +72,7 @@ export default function AdminLogin({ onLogin }) {
           type="submit"
           className="mt-2 rounded-md border border-gold bg-gold py-3 font-sans text-xs uppercase tracking-widest text-obsidian transition-opacity hover:opacity-90"
         >
-          Log In
+          {t.login.submit}
         </button>
       </form>
     </div>

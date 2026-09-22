@@ -1,6 +1,8 @@
 import { ChevronLeft, ChevronRight } from 'lucide-react'
+import { useLanguage } from '../i18n/LanguageContext'
 
 export default function Pagination({ page, pageSize, total, onPageChange }) {
+  const { t } = useLanguage()
   const totalPages = Math.max(1, Math.ceil(total / pageSize))
   const start = total === 0 ? 0 : (page - 1) * pageSize + 1
   const end = Math.min(page * pageSize, total)
@@ -12,8 +14,8 @@ export default function Pagination({ page, pageSize, total, onPageChange }) {
   return (
     <div className="mt-14 flex flex-col items-center justify-between gap-4 border-t border-frame pt-8 sm:flex-row">
       <p className="font-sans text-xs uppercase tracking-widest text-alabaster/50">
-        Exhibiting <span className="text-gold-light">{start}–{end}</span> of{' '}
-        <span className="text-gold-light">{total}</span> exhibits
+        {t.pagination.exhibiting} <span className="text-gold-light">{start}–{end}</span> {t.pagination.of}{' '}
+        <span className="text-gold-light">{total}</span> {t.pagination.exhibits}
       </p>
 
       <div className="flex items-center gap-1.5">
