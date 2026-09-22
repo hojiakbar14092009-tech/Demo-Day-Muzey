@@ -51,7 +51,7 @@ export default function ExhibitModal({ exhibit, exhibits, onClose, onNavigate })
       >
         <button
           onClick={onClose}
-          className="absolute right-4 top-4 z-30 flex h-9 w-9 items-center justify-center rounded-full border border-gold/40 bg-obsidian/70 text-parchment transition-colors hover:bg-gold hover:text-obsidian"
+          className="absolute right-4 top-4 z-30 flex h-9 w-9 items-center justify-center rounded-full border border-gold/40 bg-obsidian/70 text-parchment transition-colors hover:bg-gold hover:text-ink"
         >
           <X className="h-4 w-4" strokeWidth={1.75} />
         </button>
@@ -183,7 +183,7 @@ export default function ExhibitModal({ exhibit, exhibits, onClose, onNavigate })
           <div className="absolute right-4 top-4 z-20 flex items-center gap-1 rounded-full border border-gold/30 bg-obsidian/70 p-1 backdrop-blur-sm">
             <button
               onClick={() => setZoom((z) => Math.max(1, +(z - 0.25).toFixed(2)))}
-              className="flex h-8 w-8 items-center justify-center rounded-full text-parchment transition-colors hover:bg-gold hover:text-obsidian"
+              className="flex h-8 w-8 items-center justify-center rounded-full text-parchment transition-colors hover:bg-gold hover:text-ink"
             >
               <ZoomOut className="h-3.5 w-3.5" strokeWidth={1.75} />
             </button>
@@ -192,7 +192,7 @@ export default function ExhibitModal({ exhibit, exhibits, onClose, onNavigate })
             </span>
             <button
               onClick={() => setZoom((z) => Math.min(2.5, +(z + 0.25).toFixed(2)))}
-              className="flex h-8 w-8 items-center justify-center rounded-full text-parchment transition-colors hover:bg-gold hover:text-obsidian"
+              className="flex h-8 w-8 items-center justify-center rounded-full text-parchment transition-colors hover:bg-gold hover:text-ink"
             >
               <ZoomIn className="h-3.5 w-3.5" strokeWidth={1.75} />
             </button>

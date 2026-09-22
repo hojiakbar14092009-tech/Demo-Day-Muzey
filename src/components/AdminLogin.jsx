@@ -70,7 +70,7 @@ export default function AdminLogin({ onLogin }) {
 
         <button
           type="submit"
-          className="mt-2 rounded-md border border-gold bg-gold py-3 font-sans text-xs uppercase tracking-widest text-obsidian transition-opacity hover:opacity-90"
+          className="mt-2 rounded-md border border-gold bg-gold py-3 font-sans text-xs uppercase tracking-widest text-ink transition-opacity hover:opacity-90"
         >
           {t.login.submit}
         </button>

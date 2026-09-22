@@ -1,9 +1,11 @@
-import { Landmark, Users, ShieldCheck, LogOut } from 'lucide-react'
+import { Landmark, Users, ShieldCheck, LogOut, Sun, Moon } from 'lucide-react'
 import { useLanguage } from '../i18n/LanguageContext'
 import { LANGUAGES, LANGUAGE_LABELS } from '../i18n/translations'
+import { useTheme } from '../theme/ThemeContext'
 
 export default function Navbar({ view, setView, isAdminAuthed, onLogout }) {
   const { lang, setLang, t } = useLanguage()
+  const { theme, toggleTheme } = useTheme()
 
   return (
     <header className="sticky top-0 z-40 border-b border-frame bg-obsidian/90 backdrop-blur-md">
@@ -23,6 +25,18 @@ export default function Navbar({ view, setView, isAdminAuthed, onLogout }) {
         </div>
 
         <div className="flex flex-wrap items-center justify-end gap-3">
+          <button
+            onClick={toggleTheme}
+            aria-label="Toggle theme"
+            className="flex h-9 w-9 items-center justify-center rounded-full border border-frame bg-slate/60 text-alabaster/70 transition-colors hover:border-gold hover:text-gold-light"
+          >
+            {theme === 'dark' ? (
+              <Sun className="h-4 w-4" strokeWidth={1.75} />
+            ) : (
+              <Moon className="h-4 w-4" strokeWidth={1.75} />
+            )}
+          </button>
+
           <div className="flex items-center gap-1 rounded-full border border-frame bg-slate/60 p-1">
             {LANGUAGES.map((code) => (
               <button
@@ -30,7 +44,7 @@ export default function Navbar({ view, setView, isAdminAuthed, onLogout }) {
                 onClick={() => setLang(code)}
                 className={`rounded-full px-2.5 py-1.5 font-sans text-[11px] uppercase tracking-widest transition-all ${
                   lang === code
-                    ? 'bg-gold text-obsidian shadow-gilded'
+                    ? 'bg-gold text-ink shadow-gilded'
                     : 'text-alabaster/70 hover:text-gold-light'
                 }`}
               >
@@ -44,7 +58,7 @@ export default function Navbar({ view, setView, isAdminAuthed, onLogout }) {
               onClick={() => setView('user')}
               className={`flex items-center gap-2 rounded-full px-3 py-2 font-sans text-xs uppercase tracking-widest transition-all sm:px-5 ${
                 view === 'user'
-                  ? 'bg-gold text-obsidian shadow-gilded'
+                  ? 'bg-gold text-ink shadow-gilded'
                   : 'text-alabaster/70 hover:text-gold-light'
               }`}
             >
@@ -55,7 +69,7 @@ export default function Navbar({ view, setView, isAdminAuthed, onLogout }) {
               onClick={() => setView('admin')}
               className={`flex items-center gap-2 rounded-full px-3 py-2 font-sans text-xs uppercase tracking-widest transition-all sm:px-5 ${
                 view === 'admin'
-                  ? 'bg-gold text-obsidian shadow-gilded'
+                  ? 'bg-gold text-ink shadow-gilded'
                   : 'text-alabaster/70 hover:text-gold-light'
               }`}
             >

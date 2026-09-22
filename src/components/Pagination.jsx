@@ -33,7 +33,7 @@ export default function Pagination({ page, pageSize, total, onPageChange }) {
             onClick={() => onPageChange(p)}
             className={`flex h-9 w-9 items-center justify-center rounded-full font-sans text-xs transition-colors ${
               p === page
-                ? 'border border-gold bg-gold text-obsidian'
+                ? 'border border-gold bg-gold text-ink'
                 : 'border border-frame text-alabaster/70 hover:border-gold hover:text-gold-light'
             }`}
           >

@@ -132,7 +132,7 @@ export default function AdminPage({
           />
           <button
             type="submit"
-            className="rounded-md border border-gold bg-gold px-5 py-2.5 font-sans text-xs uppercase tracking-widest text-obsidian transition-opacity hover:opacity-90"
+            className="rounded-md border border-gold bg-gold px-5 py-2.5 font-sans text-xs uppercase tracking-widest text-ink transition-opacity hover:opacity-90"
           >
             {t.admin.saveEndpoint}
           </button>
@@ -258,7 +258,7 @@ export default function AdminPage({
           <button
             type="submit"
             disabled={busy}
-            className="mt-2 flex items-center justify-center gap-2 rounded-md border border-gold bg-gold py-3 font-sans text-xs uppercase tracking-widest text-obsidian transition-opacity hover:opacity-90 disabled:opacity-50"
+            className="mt-2 flex items-center justify-center gap-2 rounded-md border border-gold bg-gold py-3 font-sans text-xs uppercase tracking-widest text-ink transition-opacity hover:opacity-90 disabled:opacity-50"
           >
             {editingId ? <Save className="h-4 w-4" strokeWidth={2} /> : <Plus className="h-4 w-4" strokeWidth={2} />}
             {editingId ? t.admin.saveChanges : t.admin.addExhibit}

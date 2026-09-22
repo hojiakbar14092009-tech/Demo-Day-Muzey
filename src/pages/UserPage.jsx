@@ -89,7 +89,7 @@ export default function UserPage({ exhibits }) {
               onClick={() => setMuseumFilter(m)}
               className={`rounded-full border px-3.5 py-1.5 font-sans text-[11px] uppercase tracking-widest transition-colors ${
                 museumFilter === m
-                  ? 'border-gold bg-gold text-obsidian'
+                  ? 'border-gold bg-gold text-ink'
                   : 'border-frame text-alabaster/60 hover:border-gold/60 hover:text-gold-light'
               }`}
             >
