@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import Navbar from './components/Navbar'
 import Footer from './components/Footer'
+import AdminAccessGate from './components/AdminAccessGate'
 import AdminLogin from './components/AdminLogin'
 import UserPage from './pages/UserPage'
 import AdminPage from './pages/AdminPage'
@@ -27,6 +28,9 @@ export default function App() {
   const [syncStatus, setSyncStatus] = useState({ source: 'local' })
   const [isAdminAuthed, setIsAdminAuthed] = useState(
     sessionStorage.getItem('grand-musee-admin-auth') === 'true'
+  )
+  const [isAccessVerified, setIsAccessVerified] = useState(
+    sessionStorage.getItem('grand-musee-admin-access') === 'true'
   )
 
   useEffect(() => {
@@ -82,6 +86,11 @@ export default function App() {
     refresh()
   }
 
+  const handleAccessVerified = () => {
+    sessionStorage.setItem('grand-musee-admin-access', 'true')
+    setIsAccessVerified(true)
+  }
+
   const handleLogin = () => {
     sessionStorage.setItem('grand-musee-admin-auth', 'true')
     setIsAdminAuthed(true)
@@ -89,7 +98,9 @@ export default function App() {
 
   const handleLogout = () => {
     sessionStorage.removeItem('grand-musee-admin-auth')
+    sessionStorage.removeItem('grand-musee-admin-access')
     setIsAdminAuthed(false)
+    setIsAccessVerified(false)
     navigate('user')
   }
 
@@ -110,6 +121,8 @@ export default function App() {
         </div>
       ) : view === 'user' ? (
         <UserPage exhibits={exhibits} />
+      ) : !isAccessVerified ? (
+        <AdminAccessGate onVerified={handleAccessVerified} />
       ) : !isAdminAuthed ? (
         <AdminLogin onLogin={handleLogin} />
       ) : (

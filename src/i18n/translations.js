@@ -82,6 +82,14 @@ export const translations = {
       previous: 'Previous',
       next: 'Next',
     },
+    accessGate: {
+      kicker: 'Restricted Access',
+      title: 'Access Verification',
+      subtitle: 'Enter the access username to continue.',
+      username: 'Username',
+      error: 'Incorrect username.',
+      submit: 'Continue',
+    },
     login: {
       kicker: 'Curator Access',
       title: 'Admin Login',
@@ -168,6 +176,14 @@ export const translations = {
       previous: 'Назад',
       next: 'Далее',
     },
+    accessGate: {
+      kicker: 'Ограниченный доступ',
+      title: 'Проверка доступа',
+      subtitle: 'Введите имя пользователя для доступа, чтобы продолжить.',
+      username: 'Имя пользователя',
+      error: 'Неверное имя пользователя.',
+      submit: 'Продолжить',
+    },
     login: {
       kicker: 'Доступ куратора',
       title: 'Вход для администратора',
@@ -253,6 +269,14 @@ export const translations = {
       provenance: 'Kelib chiqishi va hozirgi joylashuvi',
       previous: 'Oldingi',
       next: 'Keyingi',
+    },
+    accessGate: {
+      kicker: 'Cheklangan kirish',
+      title: 'Kirishni tasdiqlash',
+      subtitle: "Davom etish uchun kirish username'ini kiriting.",
+      username: 'Username',
+      error: "Username noto'g'ri.",
+      submit: 'Davom etish',
     },
     login: {
       kicker: 'Kurator kirishi',
