@@ -16,9 +16,11 @@ import {
 import { resolveExhibitImages } from './utils/wikiImage'
 import { useLanguage } from './i18n/LanguageContext'
 
+const pathToView = (pathname) => (pathname === '/admin' ? 'admin' : 'user')
+
 export default function App() {
   const { t } = useLanguage()
-  const [view, setView] = useState('user')
+  const [view, setView] = useState(() => pathToView(window.location.pathname))
   const [exhibits, setExhibits] = useState([])
   const [loading, setLoading] = useState(true)
   const [apiUrl, setApiUrlState] = useState(getApiUrl())
@@ -31,6 +33,18 @@ export default function App() {
     refresh()
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
+
+  useEffect(() => {
+    const handlePopState = () => setView(pathToView(window.location.pathname))
+    window.addEventListener('popstate', handlePopState)
+    return () => window.removeEventListener('popstate', handlePopState)
+  }, [])
+
+  const navigate = (nextView) => {
+    const path = nextView === 'admin' ? '/admin' : '/'
+    window.history.pushState({}, '', path)
+    setView(nextView)
+  }
 
   const refresh = async () => {
     setLoading(true)
@@ -76,14 +90,14 @@ export default function App() {
   const handleLogout = () => {
     sessionStorage.removeItem('grand-musee-admin-auth')
     setIsAdminAuthed(false)
-    setView('user')
+    navigate('user')
   }
 
   return (
     <div className="min-h-screen bg-obsidian font-sans text-parchment">
       <Navbar
         view={view}
-        setView={setView}
+        setView={navigate}
         isAdminAuthed={isAdminAuthed}
         onLogout={handleLogout}
       />

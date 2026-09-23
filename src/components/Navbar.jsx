@@ -1,4 +1,4 @@
-import { Landmark, Users, ShieldCheck, LogOut, Sun, Moon } from 'lucide-react'
+import { Landmark, Users, LogOut, Sun, Moon } from 'lucide-react'
 import { useLanguage } from '../i18n/LanguageContext'
 import { LANGUAGES, LANGUAGE_LABELS } from '../i18n/translations'
 import { useTheme } from '../theme/ThemeContext'
@@ -64,17 +64,6 @@ export default function Navbar({ view, setView, isAdminAuthed, onLogout }) {
             >
               <Users className="h-3.5 w-3.5" strokeWidth={1.75} />
               <span className="hidden sm:inline">{t.nav.gallery}</span>
-            </button>
-            <button
-              onClick={() => setView('admin')}
-              className={`flex items-center gap-2 rounded-full px-3 py-2 font-sans text-xs uppercase tracking-widest transition-all sm:px-5 ${
-                view === 'admin'
-                  ? 'bg-gold text-ink shadow-gilded'
-                  : 'text-alabaster/70 hover:text-gold-light'
-              }`}
-            >
-              <ShieldCheck className="h-3.5 w-3.5" strokeWidth={1.75} />
-              <span className="hidden sm:inline">{t.nav.admin}</span>
             </button>
           </nav>
 
