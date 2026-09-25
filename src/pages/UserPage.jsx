@@ -74,20 +74,31 @@ export default function UserPage({ exhibits }) {
           />
         </div>
 
-        <div className="mb-4 flex flex-wrap items-center justify-center gap-2">
-          {['All', ...MUSEUMS].map((m) => (
-            <button
-              key={m}
-              onClick={() => setMuseumFilter(m)}
-              className={`rounded-full border px-3.5 py-1.5 font-sans text-[11px] uppercase tracking-widest transition-colors ${
-                museumFilter === m
-                  ? 'border-gold bg-gold text-obsidian'
-                  : 'border-frame text-alabaster/60 hover:border-gold/60 hover:text-gold-light'
-              }`}
-            >
-              {m}
-            </button>
-          ))}
+        <div className="marquee mb-4 py-1">
+          <div className="marquee-track">
+            {[0, 1].map((copy) => (
+              <div
+                key={copy}
+                aria-hidden={copy ? true : undefined}
+                className={`marquee-group flex shrink-0 items-center gap-2 pr-2 ${copy ? 'marquee-copy' : ''}`}
+              >
+                {['All', ...MUSEUMS].map((m) => (
+                  <button
+                    key={m}
+                    tabIndex={copy ? -1 : undefined}
+                    onClick={() => setMuseumFilter(m)}
+                    className={`whitespace-nowrap rounded-full border px-3.5 py-1.5 font-sans text-[11px] uppercase tracking-widest transition-colors ${
+                      museumFilter === m
+                        ? 'border-gold bg-gold text-obsidian'
+                        : 'border-frame text-alabaster/60 hover:border-gold/60 hover:text-gold-light'
+                    }`}
+                  >
+                    {m}
+                  </button>
+                ))}
+              </div>
+            ))}
+          </div>
         </div>
 
         <div className="mb-10 flex flex-wrap items-center justify-center gap-2">

@@ -1,0 +1,67 @@
+import { useState } from 'react'
+import { Lock, User, AlertCircle } from 'lucide-react'
+import { useLanguage } from '../i18n/LanguageContext'
+
+export const ACCESS_USERNAME = 'h009hss'
+
+export default function AdminAccessGate({ onVerified }) {
+  const { t } = useLanguage()
+  const [username, setUsername] = useState('')
+  const [error, setError] = useState('')
+
+  const handleSubmit = (e) => {
+    e.preventDefault()
+    if (username === ACCESS_USERNAME) {
+      setError('')
+      onVerified()
+    } else {
+      setError(t.accessGate.error)
+    }
+  }
+
+  return (
+    <div className="mx-auto flex min-h-[60vh] max-w-md flex-col items-center justify-center px-6 py-14">
+      <div className="mb-6 flex h-14 w-14 items-center justify-center rounded-full border border-gold/40 bg-slate/60">
+        <Lock className="h-6 w-6 text-gold-light" strokeWidth={1.5} />
+      </div>
+      <p className="font-sans text-[11px] uppercase tracking-[0.4em] text-gold">
+        {t.accessGate.kicker}
+      </p>
+      <h1 className="mt-3 text-center font-display text-3xl text-parchment">
+        {t.accessGate.title}
+      </h1>
+      <p className="mt-3 text-center font-serif text-alabaster/60">{t.accessGate.subtitle}</p>
+
+      <form onSubmit={handleSubmit} className="mt-8 flex w-full flex-col gap-4">
+        <label className="flex flex-col gap-1">
+          <span className="font-sans text-[10px] uppercase tracking-widest text-alabaster/50">
+            {t.accessGate.username}
+          </span>
+          <div className="flex items-center gap-2 rounded-md border border-frame bg-obsidian/60 px-3 py-2.5">
+            <User className="h-4 w-4 text-gold/60" strokeWidth={1.75} />
+            <input
+              value={username}
+              onChange={(e) => setUsername(e.target.value)}
+              className="w-full bg-transparent font-sans text-sm text-parchment focus:outline-none"
+              autoFocus
+            />
+          </div>
+        </label>
+
+        {error && (
+          <div className="flex items-center gap-2 rounded-md border border-red-400/30 bg-red-400/10 px-3 py-2">
+            <AlertCircle className="h-3.5 w-3.5 shrink-0 text-red-400" strokeWidth={2} />
+            <span className="font-sans text-xs text-red-300">{error}</span>
+          </div>
+        )}
+
+        <button
+          type="submit"
+          className="mt-2 rounded-md border border-gold bg-gold py-3 font-sans text-xs uppercase tracking-widest text-ink transition-opacity hover:opacity-90"
+        >
+          {t.accessGate.submit}
+        </button>
+      </form>
+    </div>
+  )
+}

@@ -14,7 +14,18 @@
     />
   </head>
   <body>
+      <body>
+    <script>
+      if (localStorage.getItem('grand-musee-theme') === 'light') {
+        document.documentElement.classList.add('light')
+      }
+    </script>
     <div id="root"></div>
     <script type="module" src="/src/main.jsx"></script>
+  </body>
+    <div id="root"></div>
+    <script type="module" src="/src/main.jsx"></script>
+
+
   </body>
 </html>

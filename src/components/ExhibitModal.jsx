@@ -1,18 +1,116 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import {
-  X, ZoomIn, ZoomOut, ChevronLeft, ChevronRight, Volume2, Pause, Ruler, MapPin, Landmark,
+  X, ZoomIn, ZoomOut, ChevronLeft, ChevronRight, Volume2, Pause, Ruler, MapPin, Landmark, Phone, UserRound,
 } from 'lucide-react'
+import { useLanguage } from '../i18n/LanguageContext'
+
+const SPEECH_LANGS = { en: 'en-US', ru: 'ru-RU', uz: 'uz-UZ' }
+// Few browsers ship an Uzbek voice; Turkish pronounces Latin-script Uzbek far better than English.
+const VOICE_FALLBACKS = { 'uz-UZ': ['tr-TR'] }
+const speechSupported = typeof window !== 'undefined' && 'speechSynthesis' in window
+
+const pickVoice = (langCode) => {
+  const voices = window.speechSynthesis.getVoices()
+  for (const code of [langCode, ...(VOICE_FALLBACKS[langCode] || [])]) {
+    const prefix = code.split('-')[0]
+    const voice =
+      voices.find((v) => v.lang === code) ||
+      voices.find((v) => v.lang.toLowerCase().startsWith(prefix))
+    if (voice) return voice
+  }
+  return null
+}
+
+// Chrome silently stops utterances longer than ~15s, so the narrative is read sentence by sentence.
+const splitSentences = (text) => text.match(/[^.!?…]+[.!?…]*\s*/g)?.map((s) => s.trim()).filter(Boolean) || []
 
 export default function ExhibitModal({ exhibit, exhibits, onClose, onNavigate }) {
+  const { lang, t } = useLanguage()
   const [zoom, setZoom] = useState(1)
   const [imgError, setImgError] = useState(false)
+  const [artistImgError, setArtistImgError] = useState(false)
   const [audioPlaying, setAudioPlaying] = useState(false)
+  const speechRunRef = useRef(0)
+  // Chrome garbage-collects unreferenced utterances mid-speech and never fires onend.
+  const utteranceRef = useRef(null)
+
+  const cancelSpeech = () => {
+    speechRunRef.current += 1
+    utteranceRef.current = null
+    if (!speechSupported) return
+    const synth = window.speechSynthesis
+    if (synth.speaking || synth.pending) synth.cancel()
+  }
+
+  const stopAudio = () => {
+    cancelSpeech()
+    setAudioPlaying(false)
+  }
+
+  const playAudio = () => {
+    if (!speechSupported || !exhibit) return
+    cancelSpeech()
+    const run = speechRunRef.current
+    const langCode = SPEECH_LANGS[lang] || 'en-US'
+    const voice = pickVoice(langCode)
+    const intro = [exhibit.title, [exhibit.artist, exhibit.year].filter(Boolean).join(', ')]
+      .filter(Boolean)
+      .join('. ')
+    const sentences = splitSentences(
+      [intro && `${intro}.`, exhibit.description, exhibit.history].filter(Boolean).join(' ')
+    )
+    if (!sentences.length) return
+
+    const finish = () => {
+      if (speechRunRef.current !== run) return
+      utteranceRef.current = null
+      setAudioPlaying(false)
+    }
+
+    // Sentences are spoken one after another (next starts on onend) so a single
+    // long utterance never hits Chrome's ~15s cut-off.
+    const speakAt = (i) => {
+      if (speechRunRef.current !== run) return
+      if (i >= sentences.length) return finish()
+      const utterance = new SpeechSynthesisUtterance(sentences[i])
+      utterance.lang = voice ? voice.lang : langCode
+      if (voice) utterance.voice = voice
+      utterance.rate = 0.95
+      utterance.onend = () => speakAt(i + 1)
+      utterance.onerror = (e) => {
+        if (e.error === 'interrupted' || e.error === 'canceled') return
+        console.warn('Audio guide error:', e.error)
+        finish()
+      }
+      utteranceRef.current = utterance
+      window.speechSynthesis.resume()
+      window.speechSynthesis.speak(utterance)
+    }
+
+    setAudioPlaying(true)
+    // Chrome drops a speak() issued in the same tick as cancel(); give it a moment.
+    setTimeout(() => speakAt(0), 120)
+  }
 
   useEffect(() => {
     setZoom(1)
     setImgError(false)
-    setAudioPlaying(false)
-  }, [exhibit?.id])
+    setArtistImgError(false)
+    stopAudio()
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [exhibit?.id, lang])
+
+  // Stop narration when the modal closes.
+  useEffect(() => () => {
+    speechRunRef.current += 1
+    utteranceRef.current = null
+    if (speechSupported) window.speechSynthesis.cancel()
+  }, [])
+
+  // Voices load asynchronously in some browsers; touching the list early warms it up.
+  useEffect(() => {
+    if (speechSupported) window.speechSynthesis.getVoices()
+  }, [])
 
   useEffect(() => {
     const handleKey = (e) => {
@@ -57,8 +155,10 @@ export default function ExhibitModal({ exhibit, exhibits, onClose, onNavigate })
           </p>
 
           <button
-            onClick={() => setAudioPlaying((p) => !p)}
-            className="mt-6 flex w-fit items-center gap-3 rounded-full border border-gold/40 bg-slate/60 px-4 py-2 transition-colors hover:border-gold"
+            onClick={audioPlaying ? stopAudio : playAudio}
+            disabled={!speechSupported}
+            title={speechSupported ? undefined : t.modal.audioUnsupported}
+            className="mt-6 flex w-fit items-center gap-3 rounded-full border border-gold/40 bg-slate/60 px-4 py-2 transition-colors hover:border-gold disabled:cursor-not-allowed disabled:opacity-50"
           >
             {audioPlaying ? (
               <Pause className="h-4 w-4 text-gold-light" strokeWidth={1.75} />
@@ -66,7 +166,7 @@ export default function ExhibitModal({ exhibit, exhibits, onClose, onNavigate })
               <Volume2 className="h-4 w-4 text-gold-light" strokeWidth={1.75} />
             )}
             <span className="font-sans text-xs uppercase tracking-widest text-alabaster/80">
-              {audioPlaying ? 'Playing Audio Guide…' : 'Play Audio Guide'}
+              {audioPlaying ? t.modal.playingAudio : t.modal.playAudio}
             </span>
             {audioPlaying && (
               <span className="flex items-end gap-0.5">
@@ -87,7 +187,7 @@ export default function ExhibitModal({ exhibit, exhibits, onClose, onNavigate })
 
           <div className="mt-6 border-l-2 border-gold/40 pl-4">
             <p className="font-display text-xs uppercase tracking-widest text-gold/80">
-              Historical Narrative
+              {t.modal.history}
             </p>
             <p className="mt-2 font-serif text-[15px] leading-relaxed text-alabaster/80">
               {exhibit.history}
@@ -99,7 +199,7 @@ export default function ExhibitModal({ exhibit, exhibits, onClose, onNavigate })
               <Ruler className="mt-0.5 h-4 w-4 shrink-0 text-gold/70" strokeWidth={1.5} />
               <div>
                 <p className="font-sans text-[10px] uppercase tracking-widest text-alabaster/50">
-                  Dimensions
+                  {t.modal.dimensions}
                 </p>
                 <p className="font-sans text-sm text-alabaster/90">{exhibit.dimensions}</p>
               </div>
@@ -108,7 +208,7 @@ export default function ExhibitModal({ exhibit, exhibits, onClose, onNavigate })
               <Landmark className="mt-0.5 h-4 w-4 shrink-0 text-gold/70" strokeWidth={1.5} />
               <div>
                 <p className="font-sans text-[10px] uppercase tracking-widest text-alabaster/50">
-                  Medium
+                  {t.modal.medium}
                 </p>
                 <p className="font-sans text-sm text-alabaster/90">{exhibit.medium}</p>
               </div>
@@ -117,14 +217,60 @@ export default function ExhibitModal({ exhibit, exhibits, onClose, onNavigate })
               <MapPin className="mt-0.5 h-4 w-4 shrink-0 text-gold/70" strokeWidth={1.5} />
               <div>
                 <p className="font-sans text-[10px] uppercase tracking-widest text-alabaster/50">
-                  Provenance &amp; Current Location
+                  {t.modal.location}
                 </p>
                 <p className="font-sans text-sm text-alabaster/90">
                   {exhibit.museumFull} — {exhibit.location}
                 </p>
               </div>
             </div>
+            {exhibit.museumPhone && (
+              <div className="col-span-2 flex items-start gap-2">
+                <Phone className="mt-0.5 h-4 w-4 shrink-0 text-gold/70" strokeWidth={1.5} />
+                <div>
+                  <p className="font-sans text-[10px] uppercase tracking-widest text-alabaster/50">
+                    {t.modal.phone}
+                  </p>
+                  <a
+                    href={`tel:${exhibit.museumPhone.replace(/[^d+]/g, '')}`}
+                    className="font-sans text-sm text-gold-light underline-offset-4 hover:underline"
+                  >
+                    {exhibit.museumPhone}
+                  </a>
+                </div>
+              </div>
+            )}
           </div>
+
+          {(exhibit.artistBio || exhibit.artistImage) && (
+            <div className="mt-8 border-t border-frame pt-6">
+              <p className="font-display text-xs uppercase tracking-widest text-gold/80">
+                {t.modal.aboutArtist}
+              </p>
+              <div className="mt-4 flex flex-col gap-5 sm:flex-row sm:items-start">
+                <div className="flex aspect-[3/4] w-full max-w-[15rem] shrink-0 items-center justify-center self-center overflow-hidden rounded-sm border border-gold/40 bg-obsidian shadow-gilded sm:w-52 sm:self-start">
+                  {exhibit.artistImage && !artistImgError ? (
+                    <img
+                      src={exhibit.artistImage}
+                      alt={exhibit.artist}
+                      onError={() => setArtistImgError(true)}
+                      className="h-full w-full object-cover object-top"
+                    />
+                  ) : (
+                    <UserRound className="h-14 w-14 text-gold/40" strokeWidth={1} />
+                  )}
+                </div>
+                <div className="min-w-0">
+                  <p className="font-display text-xl text-parchment sm:text-2xl">{exhibit.artist}</p>
+                  {exhibit.artistBio && (
+                    <p className="mt-2 font-serif text-[15px] leading-relaxed text-alabaster/80">
+                      {exhibit.artistBio}
+                    </p>
+                  )}
+                </div>
+              </div>
+            </div>
+          )}
 
           <div className="mt-8 flex items-center justify-between border-t border-frame pt-6">
             <button
@@ -132,7 +278,7 @@ export default function ExhibitModal({ exhibit, exhibits, onClose, onNavigate })
               className="flex items-center gap-2 font-sans text-xs uppercase tracking-widest text-alabaster/70 transition-colors hover:text-gold-light"
             >
               <ChevronLeft className="h-4 w-4" strokeWidth={1.75} />
-              Previous
+              {t.modal.previous}
             </button>
             <span className="font-display text-xs text-gold/60">
               {index + 1} / {exhibits.length}
@@ -141,7 +287,7 @@ export default function ExhibitModal({ exhibit, exhibits, onClose, onNavigate })
               onClick={() => onNavigate(1)}
               className="flex items-center gap-2 font-sans text-xs uppercase tracking-widest text-alabaster/70 transition-colors hover:text-gold-light"
             >
-              Next
+              {t.modal.next}
               <ChevronRight className="h-4 w-4" strokeWidth={1.75} />
             </button>
           </div>
@@ -152,7 +298,7 @@ export default function ExhibitModal({ exhibit, exhibits, onClose, onNavigate })
           <div className="pointer-events-none absolute inset-0 z-10 bg-[radial-gradient(circle_at_50%_20%,rgba(243,211,140,0.16),transparent_60%)]" />
 
           <div className="flex h-full w-full items-center justify-center overflow-hidden">
-            {!imgError ? (
+            {exhibit.image && !imgError ? (
               <img
                 src={exhibit.image}
                 alt={exhibit.title}

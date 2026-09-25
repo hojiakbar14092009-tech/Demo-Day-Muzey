@@ -1,20 +1,32 @@
 /** @type {import('tailwindcss').Config} */
+
+// Every color below reads its value from a CSS variable (see src/index.css),
+// so a single class name like `bg-obsidian` or `text-gold-light` renders the
+// dark-theme color by default and the light-theme color once `.light` is on
+// <html> — no component file needs a `dark:`/`light:` variant anywhere.
+const themable = (name) => ({
+  DEFAULT: `rgb(var(--color-${name}) / <alpha-value>)`,
+})
+
 export default {
   content: ['./index.html', './src/**/*.{js,jsx}'],
   theme: {
     extend: {
       colors: {
-        obsidian: '#0b0d11',
-        midnight: '#10141b',
-        slate: '#151922',
+        obsidian: themable('obsidian').DEFAULT,
+        midnight: themable('midnight').DEFAULT,
+        slate: themable('slate').DEFAULT,
         gold: {
-          DEFAULT: '#c5a059',
-          light: '#f3d38c',
-          dark: '#8f6c2c',
+          DEFAULT: 'rgb(var(--color-gold) / <alpha-value>)',
+          light: 'rgb(var(--color-gold-light) / <alpha-value>)',
+          dark: 'rgb(var(--color-gold-dark) / <alpha-value>)',
         },
-        parchment: '#f4f1ea',
-        alabaster: '#e2dfd7',
-        frame: '#262d3d',
+        parchment: themable('parchment').DEFAULT,
+        alabaster: themable('alabaster').DEFAULT,
+        frame: themable('frame').DEFAULT,
+        // Fixed near-black, used only for text sitting on a solid gold
+        // fill (buttons, active pills) — it must stay dark in both themes.
+        ink: 'rgb(var(--color-ink) / <alpha-value>)',
       },
       fontFamily: {
         display: ['"Cinzel"', 'serif'],

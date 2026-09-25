@@ -3,11 +3,13 @@ import {
   Plus, Pencil, Trash2, RotateCcw, Save, X, Image as ImageIcon, Database, CheckCircle2, AlertCircle, Landmark,
 } from 'lucide-react'
 import { MUSEUMS, CATEGORIES } from '../data/exhibits'
+import { DEFAULT_API_URL } from '../utils/api'
 
 const EMPTY_FORM = {
   title: '', artist: '', year: '', period: '', museum: MUSEUMS[0], museumFull: '',
   category: CATEGORIES[0], dimensions: '', medium: '', location: '', room: '',
   image: '', highlight: '', description: '', history: '',
+  museumPhone: '', artistImage: '', artistBio: '',
 }
 
 export default function AdminPage({
@@ -18,6 +20,7 @@ export default function AdminPage({
   const [apiInput, setApiInput] = useState(apiUrl || '')
   const [imgError, setImgError] = useState(false)
   const [busy, setBusy] = useState(false)
+  const [notice, setNotice] = useState(null)
 
   const updateField = (field) => (e) => {
     setForm((f) => ({ ...f, [field]: e.target.value }))
@@ -41,6 +44,7 @@ export default function AdminPage({
     e.preventDefault()
     if (!form.title || !form.artist || !form.image) return
     setBusy(true)
+    setNotice(null)
     try {
       if (editingId) {
         await onUpdate(editingId, form)
@@ -48,6 +52,9 @@ export default function AdminPage({
         await onCreate(form)
       }
       cancelEdit()
+      setNotice({ type: 'success', text: apiUrl ? 'Saved to MockAPI.' : 'Saved locally.' })
+    } catch (err) {
+      setNotice({ type: 'error', text: `Not saved: ${err.message}` })
     } finally {
       setBusy(false)
     }
@@ -55,12 +62,17 @@ export default function AdminPage({
 
   const handleDelete = async (id) => {
     if (!window.confirm('Remove this exhibit from the collection?')) return
-    await onDelete(id)
-    if (editingId === id) cancelEdit()
+    setNotice(null)
+    try {
+      await onDelete(id)
+      if (editingId === id) cancelEdit()
+    } catch (err) {
+      setNotice({ type: 'error', text: `Not deleted: ${err.message}` })
+    }
   }
 
   const handleReset = async () => {
-    if (!window.confirm('Reset the collection to the original 12 masterpieces? This cannot be undone.')) return
+    if (!window.confirm('Reset the local copy to the original 18 masterpieces? This cannot be undone.')) return
     await onReset()
     cancelEdit()
   }
@@ -91,7 +103,7 @@ export default function AdminPage({
           <input
             value={apiInput}
             onChange={(e) => setApiInput(e.target.value)}
-            placeholder="https://xxxx.mockapi.io/api/v1/exhibits"
+            placeholder={DEFAULT_API_URL}
             className="flex-1 rounded-md border border-frame bg-obsidian/60 px-4 py-2.5 font-sans text-sm text-parchment placeholder:text-alabaster/40 focus:border-gold focus:outline-none"
           />
           <button
@@ -111,7 +123,7 @@ export default function AdminPage({
             <>
               <AlertCircle className="h-3.5 w-3.5 text-amber-400" strokeWidth={2} />
               <span className="text-amber-400/90">
-                Endpoint unreachable — running on local storage fallback.
+                Endpoint unreachable{syncStatus?.error ? ` (${syncStatus.error})` : ''} — showing the local copy.
               </span>
             </>
           ) : (
@@ -184,9 +196,29 @@ export default function AdminPage({
             <Field label="Gallery Location" value={form.location} onChange={updateField('location')} />
             <Field label="Room" value={form.room} onChange={updateField('room')} />
           </div>
+          <Field label="Museum Phone" value={form.museumPhone} onChange={updateField('museumPhone')} />
+          <Field label="Artist Photo URL" value={form.artistImage} onChange={updateField('artistImage')} />
+          <Field label="About the Artist" value={form.artistBio} onChange={updateField('artistBio')} textarea />
           <Field label="Curatorial Teaser" value={form.highlight} onChange={updateField('highlight')} textarea />
           <Field label="Description" value={form.description} onChange={updateField('description')} textarea />
           <Field label="Historical Narrative" value={form.history} onChange={updateField('history')} textarea />
+
+          {notice && (
+            <div
+              className={`flex items-center gap-2 rounded-md border px-3 py-2 font-sans text-xs ${
+                notice.type === 'error'
+                  ? 'border-red-400/30 bg-red-400/10 text-red-300'
+                  : 'border-emerald-400/30 bg-emerald-400/10 text-emerald-300'
+              }`}
+            >
+              {notice.type === 'error' ? (
+                <AlertCircle className="h-3.5 w-3.5 shrink-0" strokeWidth={2} />
+              ) : (
+                <CheckCircle2 className="h-3.5 w-3.5 shrink-0" strokeWidth={2} />
+              )}
+              <span>{notice.text}</span>
+            </div>
+          )}
 
           <button
             type="submit"
@@ -254,7 +286,7 @@ export default function AdminPage({
 
 function ExhibitThumb({ exhibit }) {
   const [error, setError] = useState(false)
-  if (error) return <Landmark className="h-5 w-5 text-gold/40" strokeWidth={1.5} />
+  if (error || !exhibit.image) return <Landmark className="h-5 w-5 text-gold/40" strokeWidth={1.5} />
   return (
     <img src={exhibit.image} alt={exhibit.title} onError={() => setError(true)} className="h-full w-full object-cover" />
   )

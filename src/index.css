@@ -2,18 +2,47 @@
 @tailwind components;
 @tailwind utilities;
 
+/* Dark theme (default) */
+:root {
+  --color-obsidian: 11 13 17;
+  --color-midnight: 16 20 27;
+  --color-slate: 21 25 34;
+  --color-parchment: 244 241 234;
+  --color-alabaster: 226 223 215;
+  --color-frame: 38 45 61;
+  --color-gold: 197 160 89;
+  --color-gold-light: 243 211 140;
+  --color-gold-dark: 143 108 44;
+  --color-ink: 11 13 17;
+}
+
+/* Light theme, toggled by adding .light to <html> */
+:root.light {
+  --color-obsidian: 250 248 244;
+  --color-midnight: 240 235 224;
+  --color-slate: 255 255 255;
+  --color-parchment: 26 23 18;
+  --color-alabaster: 74 69 60;
+  --color-frame: 222 214 198;
+  --color-gold: 163 121 58;
+  --color-gold-light: 138 95 36;
+  --color-gold-dark: 90 64 24;
+  --color-ink: 11 13 17;
+}
+
 html {
   scroll-behavior: smooth;
 }
 
 body {
-  background-color: #0b0d11;
-  color: #f4f1ea;
+  background-color: rgb(var(--color-obsidian));
+  color: rgb(var(--color-parchment));
+  transition: background-color 0.2s ease, color 0.2s ease;
 }
 
 ::selection {
-  background-color: rgba(197, 160, 89, 0.35);
-  color: #f4f1ea;
+  background-color: rgb(var(--color-gold) / 0.35);
+  color: rgb(var(--color-parchment));
 }
 
 ::-webkit-scrollbar {
@@ -21,34 +50,28 @@ body {
   height: 10px;
 }
 ::-webkit-scrollbar-track {
-  background: #10141b;
+  background: rgb(var(--color-midnight));
 }
 ::-webkit-scrollbar-thumb {
-  background: #262d3d;
+  background: rgb(var(--color-frame));
   border-radius: 9999px;
-  border: 2px solid #10141b;
+  border: 2px solid rgb(var(--color-midnight));
 }
 ::-webkit-scrollbar-thumb:hover {
-  background: #8f6c2c;
+  background: rgb(var(--color-gold-dark));
 }
 
 @layer utilities {
   .text-shadow-gold {
-    text-shadow: 0 0 30px rgba(197, 160, 89, 0.25);
+    text-shadow: 0 0 30px rgb(var(--color-gold) / 0.25);
   }
   .bg-noise {
-    background-image: radial-gradient(rgba(197, 160, 89, 0.06) 1px, transparent 1px);
+    background-image: radial-gradient(rgb(var(--color-gold) / 0.06) 1px, transparent 1px);
     background-size: 3px 3px;
   }
-  .fade-in {
-    animation: fadeIn 0.4s ease both;
-  }
-  .scale-in {
-    animation: scaleIn 0.35s cubic-bezier(0.16, 1, 0.3, 1) both;
-  }
-  .slide-up {
-    animation: slideUp 0.5s cubic-bezier(0.16, 1, 0.3, 1) both;
-  }
+  .fade-in { animation: fadeIn 0.4s ease both; }
+  .scale-in { animation: scaleIn 0.35s cubic-bezier(0.16, 1, 0.3, 1) both; }
+  .slide-up { animation: slideUp 0.5s cubic-bezier(0.16, 1, 0.3, 1) both; }
 }
 
 @keyframes fadeIn {
@@ -62,4 +85,33 @@ body {
 @keyframes slideUp {
   from { opacity: 0; transform: translateY(16px); }
   to { opacity: 1; transform: translateY(0); }
+}
+/* Endless horizontal scroll for the museum filter chips. The track holds the
+   list twice and slides by exactly one copy (-50%), so the loop is seamless.
+   Hovering or focusing a chip pauses it so it can be clicked. */
+.marquee {
+  overflow: hidden;
+  -webkit-mask-image: linear-gradient(to right, transparent, #000 6%, #000 94%, transparent);
+  mask-image: linear-gradient(to right, transparent, #000 6%, #000 94%, transparent);
+}
+.marquee-track {
+  display: flex;
+  width: max-content;
+  animation: marquee 45s linear infinite;
+}
+.marquee:hover .marquee-track,
+.marquee:focus-within .marquee-track {
+  animation-play-state: paused;
+}
+@keyframes marquee {
+  from { transform: translateX(0); }
+  to { transform: translateX(-50%); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .marquee { -webkit-mask-image: none; mask-image: none; }
+  .marquee-track { animation: none; width: auto; flex-wrap: wrap; justify-content: center; }
+  .marquee-copy { display: none; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .marquee-group { flex-wrap: wrap; justify-content: center; }
 }
