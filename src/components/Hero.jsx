@@ -26,12 +26,13 @@ export default function Hero({ exhibitCount, museumCount }) {
     const k = depth(c)
     counters.forEach((el) => { el.firstChild.nodeValue = '0' })
 
-    // Entrance: the room lights up, the name steps forward from depth.
+    // Entrance: the room lights up, the name steps forward from depth. The
+    // title stays split (it is static text) so its words can part on scroll.
     const chars = SplitText.create(title, { type: 'chars,words' })
     const lines = SplitText.create(quote, { type: 'lines', mask: 'lines' })
     const tl = gsap.timeline({
       delay: 0.15,
-      onComplete: () => { chars.revert(); lines.revert() },
+      onComplete: () => lines.revert(),
     })
     tl.from(q('[data-hero-rule]'), { scaleX: 0, duration: 1.6, ease: 'expo.inOut', stagger: 0.1 })
       .from(q('[data-hero-kicker]'), { autoAlpha: 0, letterSpacing: '0.9em', duration: 1.6, ease: 'expo.out' }, 0.2)
@@ -48,22 +49,23 @@ export default function Hero({ exhibitCount, museumCount }) {
       }, 1.0)
       .add(() => countUp(0), 1.0)
 
-    // Leaving the entrance hall: the content recedes into depth while the
-    // layers part at different speeds. Desktop holds the room briefly (pin).
+    // Leaving the entrance hall: the name comes apart in space — "The" and
+    // "Musée" swing out to the sides, "Grand" flies straight at the camera —
+    // while the quote rises faster than the page and the stats tip away.
+    const [w1, w2, w3] = chars.words
+    const side = () => window.innerWidth * 0.36 * k
     const exit = gsap.timeline({
-      scrollTrigger: {
-        trigger: root,
-        start: 'top top',
-        end: c.desktop ? '+=55%' : 'bottom top',
-        scrub: 0.9,
-        pin: c.desktop,
-        pinSpacing: true,
-      },
+      defaults: { ease: 'power1.in' },
+      scrollTrigger: { trigger: root, start: 'top top', end: 'bottom top', scrub: 0.8, invalidateOnRefresh: true },
     })
     exit
-      .to(q('[data-hero-stage]'), { z: -260 * k, rotateX: 10 * k, yPercent: -6, autoAlpha: 0.08, transformPerspective: 1000, ease: 'none' }, 0)
-      .to(q('[data-hero-layer="far"]'), { yPercent: -40 * k, ease: 'none' }, 0)
-      .to(q('[data-hero-layer="near"]'), { yPercent: 30 * k, ease: 'none' }, 0)
+      .to(w1, { x: () => -side(), rotateY: 75 * k, z: -500 * k, autoAlpha: 0, transformPerspective: 900 }, 0)
+      .to(w2, { z: 750 * k, scale: 1.3, autoAlpha: 0, transformPerspective: 900 }, 0)
+      .to(w3, { x: side, rotateY: -75 * k, z: -500 * k, autoAlpha: 0, transformPerspective: 900 }, 0)
+      .to(q('[data-hero-rule], [data-hero-kicker]'), { y: -140 * k, autoAlpha: 0, ease: 'none' }, 0)
+      .to(quote, { yPercent: -160 * k, autoAlpha: 0, ease: 'none' }, 0)
+      .to(q('[data-hero-layer="near"]'), { yPercent: 70 * k, rotateX: -35 * k, autoAlpha: 0, transformPerspective: 800 }, 0)
+      .to(q('[data-hero-layer="far"]'), { yPercent: -55 * k, ease: 'none' }, 0)
 
     // Cursor parallax on the text layers (desktop, real mouse only).
     if (!window.matchMedia(FINE_POINTER).matches) return

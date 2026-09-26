@@ -4,7 +4,7 @@ import ExhibitModal from '../components/ExhibitModal'
 import { ARTISTS } from '../data/artists'
 import { useLanguage } from '../i18n/LanguageContext'
 import { useMotion } from '../motion/useMotion'
-import { revealFrom, revealLines, revealMedia, mediaParallax, parallax } from '../motion/core'
+import { gsap, revealFrom, revealLines, parallax } from '../motion/core'
 
 export default function CreatorsPage({ exhibits }) {
   const { lang, t } = useLanguage()
@@ -97,10 +97,28 @@ function CreatorCard({ creator, lang, worksLabel, reversed, divided, onOpenWork 
   useMotion(scope, (c, root) => {
     const q = (sel) => root.querySelector(sel)
     const portrait = q('[data-portrait]')
-    revealFrom(portrait, reversed ? 'swingRight' : 'swingLeft', c, { trigger: root, start: 'top 82%', duration: 1.9 })
-    revealMedia(q('[data-mask]'), q('.reveal-media'), c, { trigger: root, start: 'top 82%', delay: 0.2, from: reversed ? 'right' : 'left' })
-    mediaParallax(q('.reveal-media'), c, { amount: 6, trigger: root })
-    parallax(portrait, c, { amount: 40, trigger: root })
+    const mask = q('[data-mask]'), media = q('.reveal-media')
+    if (c.reduce) {
+      revealFrom(portrait, 'drift', c, { trigger: root })
+    } else {
+      // Scroll-scrubbed path: the portrait swings in from its own side out of
+      // deep space through a widening circular window, holds, then turns away
+      // and sinks as it leaves — in reverse when scrolling back.
+      const k = c.desktop ? 1 : c.tablet ? 0.7 : 0.5
+      const side = reversed ? 1 : -1
+      const tl = gsap.timeline({ defaults: { ease: 'none' }, scrollTrigger: { trigger: root, start: 'top bottom', end: 'bottom top', scrub: 0.9 } })
+      tl.fromTo(portrait, {
+        rotateY: -side * 70 * k, rotateZ: side * 8 * k, x: side * 160 * k, z: -1000 * k, autoAlpha: 0,
+        transformPerspective: 1300, transformOrigin: reversed ? '0% 50%' : '100% 50%',
+      }, { rotateY: 0, rotateZ: 0, x: 0, z: 0, autoAlpha: 1, duration: 0.4, ease: 'power2.out' }, 0)
+      tl.fromTo(mask, { clipPath: 'circle(12% at 50% 42%)' }, { clipPath: 'circle(80% at 50% 42%)', duration: 0.36, ease: 'power2.out' }, 0.04)
+      if (media) {
+        tl.fromTo(media, { '--reveal-scale': 1.6 }, { '--reveal-scale': 1, duration: 0.42, ease: 'power2.out' }, 0)
+        tl.fromTo(media, { '--parallax-y': '-14%' }, { '--parallax-y': '14%', duration: 1 }, 0)
+      }
+      tl.to(portrait, { rotateY: side * 22 * k, z: -380 * k, autoAlpha: 0.35, duration: 0.25, ease: 'power1.in' }, 0.75)
+      parallax(q('[data-text]'), c, { amount: 28, trigger: root })
+    }
     revealFrom(q('[data-years]'), 'drift', c, { trigger: root, start: 'top 80%', delay: 0.25 })
     revealLines(q('h2'), c, { trigger: root, start: 'top 80%', delay: 0.35 })
     revealLines(q('[data-role]'), c, { trigger: root, start: 'top 80%', delay: 0.5 })
@@ -125,6 +143,7 @@ function CreatorCard({ creator, lang, worksLabel, reversed, divided, onOpenWork 
                 alt={pick(creator.name)}
                 loading="lazy"
                 onError={() => setImgError(true)}
+                style={{ '--media-zoom': 1.32 }}
                 className="reveal-media h-full w-full object-cover object-top"
               />
             ) : (
@@ -134,7 +153,7 @@ function CreatorCard({ creator, lang, worksLabel, reversed, divided, onOpenWork 
         </div>
       </div>
 
-      <div key={lang} className="min-w-0 flex-1">
+      <div key={lang} data-text className="min-w-0 flex-1">
         <p data-years className="font-display text-xs uppercase tracking-widest text-gold">{creator.years}</p>
         <h2 className="mt-2 font-display text-2xl text-parchment sm:text-3xl">{pick(creator.name)}</h2>
         <p data-role className="mt-1 font-serif text-lg italic text-gold-light">{pick(creator.role)}</p>

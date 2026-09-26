@@ -1,15 +1,34 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { Search, SlidersHorizontal, X } from 'lucide-react'
 import Hero from '../components/Hero'
+import ExhibitionSequence from '../components/ExhibitionSequence'
 import ExhibitCard from '../components/ExhibitCard'
 import ExhibitModal from '../components/ExhibitModal'
 import Pagination from '../components/Pagination'
 import { MUSEUMS, CATEGORIES } from '../data/exhibits'
 import { useMotion } from '../motion/useMotion'
-import { revealFrom, revealMedia } from '../motion/core'
+import { gsap, ScrollTrigger, revealFrom, revealMedia } from '../motion/core'
 
 const PAGE_SIZE = 6
 const SIZE_PATTERN = ['tall', 'normal', 'wide', 'normal', 'tall', 'wide']
+
+// How many gallery columns the viewport holds (3 desktop, 2 tablet, 1 phone).
+const columnsFor = () =>
+  window.matchMedia('(min-width: 1024px)').matches ? 3 : window.matchMedia('(min-width: 640px)').matches ? 2 : 1
+function useColumnCount() {
+  const [count, setCount] = useState(columnsFor)
+  useEffect(() => {
+    const queries = ['(min-width: 1024px)', '(min-width: 640px)'].map((q) => window.matchMedia(q))
+    const update = () => setCount(columnsFor())
+    queries.forEach((mq) => mq.addEventListener('change', update))
+    return () => queries.forEach((mq) => mq.removeEventListener('change', update))
+  }, [])
+  return count
+}
+
+// Column scroll speeds (px over the grid's passage): the middle column travels
+// against the others, so the wall of pictures shears apart as you scroll.
+const COLUMN_DRIFT = { 1: [0], 2: [-110, 130], 3: [-170, 150, -280] }
 
 export default function UserPage({ exhibits }) {
   const [query, setQuery] = useState('')
@@ -18,6 +37,8 @@ export default function UserPage({ exhibits }) {
   const [page, setPage] = useState(1)
   const [selected, setSelected] = useState(null)
   const controls = useRef(null)
+  const grid = useRef(null)
+  const columnCount = useColumnCount()
 
   // The collection controls arrive one after another: the search rises from
   // depth, the museum ribbon opens from the centre, the categories drift in.
@@ -50,6 +71,39 @@ export default function UserPage({ exhibits }) {
   const totalPages = Math.max(1, Math.ceil(filtered.length / PAGE_SIZE))
   const safePage = Math.min(page, totalPages)
   const paginated = filtered.slice((safePage - 1) * PAGE_SIZE, safePage * PAGE_SIZE)
+  const columns = Array.from({ length: columnCount }, (_, col) =>
+    paginated.map((exhibit, i) => ({ exhibit, i })).filter(({ i }) => i % columnCount === col)
+  )
+  const pageKey = paginated.map((e) => e.id).join('|')
+
+  // Columns drift at different speeds, and the whole wall leans back with
+  // scroll velocity (eased on the ticker so it settles smoothly).
+  useMotion(grid, (c, root) => {
+    if (c.reduce) return undefined
+    const k = c.desktop ? 1 : c.tablet ? 0.7 : 0.5
+    const drift = COLUMN_DRIFT[columnCount] || []
+    gsap.utils.toArray(root.children).forEach((col, i) => {
+      if (!drift[i]) return
+      gsap.fromTo(col, { y: -drift[i] * k }, {
+        y: drift[i] * k, ease: 'none',
+        scrollTrigger: { trigger: root, start: 'top bottom', end: 'bottom top', scrub: 1 },
+      })
+    })
+    gsap.set(root, { transformPerspective: 1600, transformOrigin: '50% 50%' })
+    const lean = { now: 0, target: 0 }
+    const setLean = gsap.quickSetter(root, 'rotateX', 'deg')
+    const st = ScrollTrigger.create({
+      trigger: root, start: 'top bottom', end: 'bottom top',
+      onUpdate: (self) => { lean.target = gsap.utils.clamp(-12, 12, self.getVelocity() / -220) * k },
+    })
+    const tick = () => {
+      lean.target *= 0.92
+      lean.now += (lean.target - lean.now) * (1 - Math.pow(0.88, gsap.ticker.deltaRatio()))
+      setLean(lean.now)
+    }
+    gsap.ticker.add(tick)
+    return () => { st.kill(); gsap.ticker.remove(tick) }
+  }, [columnCount, pageKey])
 
   const handleNavigate = (direction) => {
     setSelected((current) => {
@@ -71,6 +125,7 @@ export default function UserPage({ exhibits }) {
   return (
     <div>
       <Hero exhibitCount={exhibits.length} museumCount={MUSEUMS.length} />
+      <ExhibitionSequence exhibits={exhibits} />
 
       <section className="mx-auto max-w-7xl px-6 py-14 sm:px-8">
         <div ref={controls}>
@@ -148,15 +203,21 @@ export default function UserPage({ exhibits }) {
         </div>
 
         {paginated.length > 0 ? (
-          <div className="columns-1 gap-5 sm:columns-2 lg:columns-3 [&>*]:mb-5 [&>*]:break-inside-avoid">
-            {paginated.map((exhibit, i) => (
-              <ExhibitCard
-                key={exhibit.id}
-                exhibit={exhibit}
-                index={(safePage - 1) * PAGE_SIZE + i}
-                size={SIZE_PATTERN[i % SIZE_PATTERN.length]}
-                onOpen={setSelected}
-              />
+          <div ref={grid} className="gallery-wall flex items-start gap-6 pb-24 pt-6 lg:gap-12 lg:pb-40">
+            {columns.map((column, col) => (
+              <div key={col} className={`flex min-w-0 flex-1 flex-col gap-10 lg:gap-16 ${col === 1 ? 'lg:mt-44 sm:mt-24' : col === 2 ? 'lg:mt-16' : ''}`}>
+                {column.map(({ exhibit, i }) => (
+                  <ExhibitCard
+                    key={exhibit.id}
+                    exhibit={exhibit}
+                    index={(safePage - 1) * PAGE_SIZE + i}
+                    size={SIZE_PATTERN[i % SIZE_PATTERN.length]}
+                    column={col}
+                    columns={columnCount}
+                    onOpen={setSelected}
+                  />
+                ))}
+              </div>
             ))}
           </div>
         ) : (

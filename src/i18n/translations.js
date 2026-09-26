@@ -25,6 +25,7 @@ export const TRANSLATIONS = {
       tba: 'To be announced', museumLines: "Each museum's own phone number is listed on its exhibits.",
     },
     cursor: { view: 'View' },
+    sequence: { kicker: 'The Grand Procession', words: ['Masterpieces', 'in', 'Motion'], hint: 'Scroll to enter the hall', of: 'of' },
     accessGate: {
       kicker: 'Restricted Area',
       title: 'Access Verification',
@@ -54,6 +55,7 @@ export const TRANSLATIONS = {
       tba: 'Скоро появится', museumLines: 'Телефон каждого музея указан на странице его экспонатов.',
     },
     cursor: { view: 'Смотреть' },
+    sequence: { kicker: 'Большая процессия', words: ['Шедевры', 'в', 'движении'], hint: 'Прокрутите, чтобы войти в зал', of: 'из' },
     accessGate: {
       kicker: 'Закрытая зона',
       title: 'Проверка доступа',
@@ -83,6 +85,7 @@ export const TRANSLATIONS = {
       tba: "Tez orada e'lon qilinadi", museumLines: "Har bir muzeyning telefon raqami uning eksponatlarida ko'rsatilgan.",
     },
     cursor: { view: "Ko'rish" },
+    sequence: { kicker: "Buyuk ko'rgazma yurishi", words: ['Durdonalar', 'shu', 'harakatda'], hint: 'Zalga kirish uchun aylantiring', of: '/' },
     accessGate: {
       kicker: 'Yopiq hudud',
       title: 'Kirishni tasdiqlash',

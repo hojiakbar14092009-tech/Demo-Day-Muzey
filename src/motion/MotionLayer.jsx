@@ -3,6 +3,7 @@ import Lenis from 'lenis'
 import { gsap, ScrollTrigger, FINE_POINTER } from './core'
 
 let lenis = null
+const SCROLL_KEY = 'grand-musee-scroll'
 
 /** Scrolls to the top, through Lenis when it is running. */
 export function scrollToTop() {
@@ -46,9 +47,30 @@ export default function MotionLayer({ view }) {
     }
   }, [])
 
+  // The gallery loads its data asynchronously, so the browser's own scroll
+  // restoration would land at the top after a reload. Remember the position
+  // ourselves and put it back once the page has content (even mid-sequence).
+  useEffect(() => {
+    if ('scrollRestoration' in window.history) window.history.scrollRestoration = 'manual'
+    const save = () => sessionStorage.setItem(SCROLL_KEY, JSON.stringify({ path: window.location.pathname, y: window.scrollY }))
+    window.addEventListener('pagehide', save)
+    return () => window.removeEventListener('pagehide', save)
+  }, [])
+
   // Re-measure every trigger once a page's content (and fonts) have settled.
   useEffect(() => {
-    const id = setTimeout(() => ScrollTrigger.refresh(), 120)
+    let saved = null
+    try { saved = JSON.parse(sessionStorage.getItem(SCROLL_KEY) || 'null') } catch { /* ignore */ }
+    const restore = view !== 'loading' && saved?.path === window.location.pathname && saved.y > 0
+    const id = setTimeout(() => {
+      ScrollTrigger.refresh()
+      if (!restore) return
+      sessionStorage.removeItem(SCROLL_KEY)
+      window.scrollTo(0, saved.y)
+      // Lenis caches the page height; re-measure so the pinned sections' spacers count.
+      if (lenis) { lenis.resize(); lenis.scrollTo(saved.y, { immediate: true, force: true }) }
+      ScrollTrigger.update()
+    }, 120)
     document.fonts?.ready.then(() => ScrollTrigger.refresh())
     return () => clearTimeout(id)
   }, [view])

@@ -22,7 +22,8 @@ export default function AmbientOrnaments() {
     layers.forEach((el) => {
       const d = parseFloat(el.dataset.depth)
       gsap.to(el, {
-        y: -420 * d,
+        y: (d === 0.7 ? 1 : -1) * 1100 * d,
+        rotate: d === 0.35 ? -6 : 0,
         ease: 'none',
         scrollTrigger: { trigger: document.documentElement, start: 'top top', end: 'bottom bottom', scrub: 1.2 },
       })
@@ -35,7 +36,7 @@ export default function AmbientOrnaments() {
     }))
     const onMove = (e) => {
       const nx = e.clientX / window.innerWidth - 0.5, ny = e.clientY / window.innerHeight - 0.5
-      movers.forEach((m) => { m.x(-nx * 40 * m.d); m.y(-ny * 30 * m.d) })
+      movers.forEach((m) => { m.x(-nx * 90 * m.d); m.y(-ny * 60 * m.d) })
     }
     window.addEventListener('pointermove', onMove, { passive: true })
     return () => window.removeEventListener('pointermove', onMove)

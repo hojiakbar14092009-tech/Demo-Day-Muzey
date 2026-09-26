@@ -1,7 +1,7 @@
 import { useRef, useState } from 'react'
 import { Landmark } from 'lucide-react'
 import { useMotion } from '../motion/useMotion'
-import { revealFrom, revealMedia, mediaParallax } from '../motion/core'
+import { gsap } from '../motion/core'
 import { useLanguage } from '../i18n/LanguageContext'
 
 const ASPECT = {
@@ -10,27 +10,41 @@ const ASPECT = {
   normal: 'aspect-[3/4]',
 }
 
-export default function ExhibitCard({ exhibit, index, size = 'normal', onOpen }) {
+export default function ExhibitCard({ exhibit, index, size = 'normal', column = 0, columns = 1, onOpen }) {
   const [imgError, setImgError] = useState(false)
   const { t } = useLanguage()
   const scope = useRef(null)
   const catalogNumber = String(index + 1).padStart(2, '0')
 
-  // Each card enters according to the column it landed in: the left column
-  // swings in from the left, the middle rises out of depth, the right column
-  // swings from the right. The picture then emerges from behind its frame.
+  // Each card travels a full scroll-linked path through depth: it rises from
+  // far below the floor, tipped back and turned toward its column's side, while
+  // its picture opens from an oval to the full canvas and drifts inside the
+  // frame; leaving the top, it leans back and sinks away again. Scrubbed, so
+  // scrolling up plays it all in reverse.
   useMotion(scope, (c, root) => {
-    const row = root.parentElement.getBoundingClientRect()
-    const box = root.getBoundingClientRect()
-    const column = Math.min(2, Math.floor(((box.left + box.width / 2 - row.left) / row.width) * 3))
-    const pose = ['swingLeft', 'depth', 'swingRight'][column] ?? 'rise'
-    const delay = column * 0.12
     const mask = root.querySelector('[data-mask]')
     const media = root.querySelector('.reveal-media')
-    revealFrom(root, pose, c, { delay, duration: 1.8 })
-    revealMedia(mask, media, c, { trigger: root, delay: delay + 0.15, from: column === 1 ? 'iris' : 'up' })
-    mediaParallax(media, c, { amount: 5, trigger: root })
-  }, [exhibit.id])
+    if (c.reduce) {
+      gsap.from(root, { autoAlpha: 0, y: 16, duration: 0.7, ease: 'power2.out', scrollTrigger: { trigger: root, start: 'top 90%', once: true } })
+      return
+    }
+    const k = c.desktop ? 1 : c.tablet ? 0.7 : 0.5
+    const side = columns === 1 ? 0 : column === 0 ? -1 : column === columns - 1 ? 1 : 0
+    const tl = gsap.timeline({
+      defaults: { ease: 'none' },
+      scrollTrigger: { trigger: root, start: 'top bottom', end: 'bottom top', scrub: 0.9 },
+    })
+    tl.fromTo(root, {
+      rotateX: 58 * k, rotateY: side * -38 * k, rotateZ: side * 6 * k, z: -900 * k, x: side * 120 * k,
+      yPercent: 18, autoAlpha: 0, transformPerspective: 1300, transformOrigin: '50% 100%',
+    }, { rotateX: 0, rotateY: 0, rotateZ: 0, z: 0, x: 0, yPercent: 0, autoAlpha: 1, duration: 0.42, ease: 'power2.out' }, 0)
+    tl.fromTo(mask, { clipPath: 'inset(22% 14% 22% 14% round 48%)' }, { clipPath: 'inset(0% 0% 0% 0% round 0%)', duration: 0.38, ease: 'power2.out' }, 0.02)
+    if (media) {
+      tl.fromTo(media, { '--reveal-scale': 1.5 }, { '--reveal-scale': 1, duration: 0.45, ease: 'power2.out' }, 0)
+      tl.fromTo(media, { '--parallax-y': '-16%' }, { '--parallax-y': '16%', duration: 1 }, 0)
+    }
+    tl.to(root, { rotateX: -34 * k, rotateY: side * 18 * k, z: -420 * k, autoAlpha: 0.15, duration: 0.28, ease: 'power1.in' }, 0.72)
+  }, [exhibit.id, column, columns])
 
   return (
     <div ref={scope}>
@@ -59,7 +73,8 @@ export default function ExhibitCard({ exhibit, index, size = 'normal', onOpen })
               alt={exhibit.title}
               loading="lazy"
               onError={() => setImgError(true)}
-              className="reveal-media h-full w-full object-cover transition-transform duration-700 ease-out group-hover:scale-110"
+              style={{ '--media-zoom': 1.36 }}
+            className="reveal-media h-full w-full object-cover transition-transform duration-700 ease-out group-hover:scale-110"
             />
           ) : (
             <div className="flex h-full w-full flex-col items-center justify-center gap-3 bg-gradient-to-br from-slate via-midnight to-obsidian transition-transform duration-700 ease-out group-hover:scale-110">
