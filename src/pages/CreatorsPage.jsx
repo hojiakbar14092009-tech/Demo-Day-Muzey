@@ -78,18 +78,20 @@ function CreatorCard({ creator, lang, worksLabel, reversed, divided, onOpenWork 
         divided ? 'rule-heritage' : 'pt-2 sm:pt-2'
       }`}
     >
-      <div className="flex aspect-[3/4] w-full max-w-xs shrink-0 items-center justify-center self-center overflow-hidden rounded-sm bg-midnight frame-heritage md:w-72 md:self-start">
-        {creator.image && !imgError ? (
-          <img
-            src={creator.image}
-            alt={pick(creator.name)}
-            loading="lazy"
-            onError={() => setImgError(true)}
-            className="h-full w-full object-cover object-top"
-          />
-        ) : (
-          <UserRound className="h-16 w-16 text-gold/40" strokeWidth={1} />
-        )}
+      <div className="frame-gilded w-full max-w-xs shrink-0 self-center md:w-72 md:self-start">
+        <div className="flex aspect-[3/4] w-full items-center justify-center overflow-hidden bg-midnight">
+          {creator.image && !imgError ? (
+            <img
+              src={creator.image}
+              alt={pick(creator.name)}
+              loading="lazy"
+              onError={() => setImgError(true)}
+              className="h-full w-full object-cover object-top"
+            />
+          ) : (
+            <UserRound className="h-16 w-16 text-gold/40" strokeWidth={1} />
+          )}
+        </div>
       </div>
 
       <div className="min-w-0 flex-1">
@@ -120,18 +122,20 @@ function WorkChip({ work, onOpen }) {
       onClick={() => onOpen(work)}
       className="group flex items-center gap-3 rounded-sm border border-frame bg-obsidian/60 p-2 pr-4 text-left transition-colors hover:border-gold"
     >
-      <span className="frame-heritage frame-sm flex h-14 w-14 shrink-0 items-center justify-center overflow-hidden rounded-sm bg-midnight">
-        {work.image && !imgError ? (
-          <img
-            src={work.image}
-            alt={work.title}
-            loading="lazy"
-            onError={() => setImgError(true)}
-            className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-110"
-          />
-        ) : (
-          <Landmark className="h-5 w-5 text-gold/40" strokeWidth={1.5} />
-        )}
+      <span className="frame-gilded frame-gilded-sm block shrink-0">
+        <span className="flex h-14 w-14 items-center justify-center overflow-hidden bg-midnight">
+          {work.image && !imgError ? (
+            <img
+              src={work.image}
+              alt={work.title}
+              loading="lazy"
+              onError={() => setImgError(true)}
+              className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-110"
+            />
+          ) : (
+            <Landmark className="h-5 w-5 text-gold/40" strokeWidth={1.5} />
+          )}
+      </span>
       </span>
       <span className="min-w-0">
         <span className="block font-display text-sm text-parchment group-hover:text-gold-light">{work.title}</span>

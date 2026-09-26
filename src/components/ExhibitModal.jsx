@@ -137,7 +137,7 @@ export default function ExhibitModal({ exhibit, exhibits, onClose, onNavigate })
       >
         <button
           onClick={onClose}
-          className="absolute right-4 top-4 z-30 flex h-9 w-9 items-center justify-center rounded-full border border-gold/40 bg-obsidian/70 text-parchment transition-colors hover:bg-gold hover:text-obsidian"
+          className="absolute right-4 top-4 z-50 flex h-9 w-9 items-center justify-center rounded-full border border-gold/40 bg-obsidian/70 text-parchment transition-colors hover:bg-gold hover:text-obsidian"
         >
           <X className="h-4 w-4" strokeWidth={1.75} />
         </button>
@@ -248,17 +248,19 @@ export default function ExhibitModal({ exhibit, exhibits, onClose, onNavigate })
                 {t.modal.aboutArtist}
               </p>
               <div className="mt-4 flex flex-col gap-5 sm:flex-row sm:items-start">
-                <div className="flex aspect-[3/4] w-full max-w-[15rem] shrink-0 items-center justify-center self-center overflow-hidden rounded-sm bg-midnight frame-heritage sm:w-52 sm:self-start">
-                  {exhibit.artistImage && !artistImgError ? (
-                    <img
-                      src={exhibit.artistImage}
-                      alt={exhibit.artist}
-                      onError={() => setArtistImgError(true)}
-                      className="h-full w-full object-cover object-top"
-                    />
-                  ) : (
-                    <UserRound className="h-14 w-14 text-gold/40" strokeWidth={1} />
-                  )}
+                <div className="frame-gilded frame-gilded-md w-full max-w-[15rem] shrink-0 self-center sm:w-52 sm:self-start">
+                  <div className="flex aspect-[3/4] w-full items-center justify-center overflow-hidden bg-midnight">
+                    {exhibit.artistImage && !artistImgError ? (
+                      <img
+                        src={exhibit.artistImage}
+                        alt={exhibit.artist}
+                        onError={() => setArtistImgError(true)}
+                        className="h-full w-full object-cover object-top"
+                      />
+                    ) : (
+                      <UserRound className="h-14 w-14 text-gold/40" strokeWidth={1} />
+                    )}
+                  </div>
                 </div>
                 <div className="min-w-0">
                   <p className="font-display text-xl text-parchment sm:text-2xl">{exhibit.artist}</p>
@@ -294,7 +296,7 @@ export default function ExhibitModal({ exhibit, exhibits, onClose, onNavigate })
         </div>
 
         {/* RIGHT: image, zoom, plaque */}
-        <div className="frame-inset relative order-1 h-[42vh] overflow-hidden bg-obsidian md:order-2 md:h-auto">
+        <div className="frame-gilded frame-gilded-lg relative order-1 h-[42vh] overflow-hidden bg-midnight md:order-2 md:h-auto">
 
           <div className="flex h-full w-full items-center justify-center overflow-hidden">
             {exhibit.image && !imgError ? (
@@ -313,7 +315,7 @@ export default function ExhibitModal({ exhibit, exhibits, onClose, onNavigate })
             )}
           </div>
 
-          <div className="absolute right-4 top-4 z-20 flex items-center gap-1 rounded-full border border-gold/30 bg-obsidian/70 p-1 backdrop-blur-sm">
+          <div className="absolute left-[calc(var(--band)+0.75rem)] top-[calc(var(--band)+0.75rem)] z-40 flex items-center gap-1 rounded-full border border-gold/30 bg-obsidian/70 p-1 backdrop-blur-sm">
             <button
               onClick={() => setZoom((z) => Math.max(1, +(z - 0.25).toFixed(2)))}
               className="flex h-8 w-8 items-center justify-center rounded-full text-parchment transition-colors hover:bg-gold hover:text-obsidian"
@@ -331,7 +333,7 @@ export default function ExhibitModal({ exhibit, exhibits, onClose, onNavigate })
             </button>
           </div>
 
-          <div className="absolute inset-x-4 bottom-4 z-20 rounded-sm border border-gold/40 bg-obsidian/80 px-4 py-3 backdrop-blur-sm sm:inset-x-6 sm:bottom-6">
+          <div className="absolute inset-x-[calc(var(--band)+0.75rem)] bottom-[calc(var(--band)+0.75rem)] z-40 rounded-sm border border-gold/40 bg-obsidian/80 px-4 py-3 backdrop-blur-sm">
             <p className="font-display text-sm text-gold-light sm:text-base">{exhibit.title}</p>
             <p className="font-sans text-[11px] uppercase tracking-widest text-alabaster/60">
               {exhibit.museumFull}

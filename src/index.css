@@ -89,19 +89,39 @@ body {
       0 0 0 calc(var(--mat) + 1px) rgb(var(--color-gold) / 0.35),
       var(--shadow-soft);
   }
-  .frame-sm { --mat: 3px; }
 
-  /* Inner frame for large image panels that sit flush inside a container. */
-  .frame-inset { position: relative; }
-  .frame-inset::after {
+  /* Carved gilt picture frame for every artwork and portrait.
+     The artwork sits in the padding box; the frame is a border-image drawn on
+     an overlay, so the carved corners can overlap the canvas edge like a real
+     frame. frame-gilded.png is built from the public-domain Wikimedia Commons
+     file "Empty-frame.png": 150px corners (one corner mirrored four ways, so
+     every join is seamless) and 63px-thick sides that repeat with "round".
+     Size it with --band (visible frame thickness). */
+  .frame-gilded {
+    --band: 26px;
+    position: relative;
+    padding: calc(var(--band) * 0.92);
+  }
+  .frame-gilded::before {
     content: '';
     position: absolute;
-    inset: 12px;
-    z-index: 15;
+    inset: 0;
+    z-index: 30;
     pointer-events: none;
-    border: 1px solid rgb(var(--color-slate) / 0.7);
-    outline: 1px solid rgb(var(--color-gold) / 0.45);
-    outline-offset: 3px;
+    border-style: solid;
+    border-width: calc(var(--band) * 150 / 63);
+    border-image: url('./assets/frame-gilded.png') 150 round;
+    filter: sepia(0.25) saturate(1.5) brightness(1.08) contrast(1.05)
+      drop-shadow(0 6px 10px rgb(40 28 10 / 0.35));
+  }
+  .frame-gilded-sm { --band: 10px; }
+  .frame-gilded-md { --band: 18px; }
+  .frame-gilded-lg { --band: 34px; }
+  @media (max-width: 640px) {
+    .frame-gilded { --band: 20px; }
+    .frame-gilded-sm { --band: 9px; }
+    .frame-gilded-md { --band: 16px; }
+    .frame-gilded-lg { --band: 22px; }
   }
 
   /* Heritage card: thin bronze border with a quiet inner rule. */

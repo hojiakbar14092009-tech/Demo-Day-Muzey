@@ -156,20 +156,22 @@ export default function AdminPage({
             )}
           </div>
 
-          <div className="frame-heritage frame-sm flex h-40 w-full items-center justify-center overflow-hidden rounded-sm bg-midnight">
-            {form.image && !imgError ? (
-              <img
-                src={form.image}
-                alt="preview"
-                onError={() => setImgError(true)}
-                className="h-full w-full object-cover"
-              />
-            ) : (
-              <div className="flex flex-col items-center gap-2 text-alabaster/30">
-                <ImageIcon className="h-6 w-6" strokeWidth={1.5} />
-                <span className="font-sans text-[11px]">Live image preview</span>
-              </div>
-            )}
+          <div className="frame-gilded frame-gilded-md">
+            <div className="flex h-40 w-full items-center justify-center overflow-hidden bg-midnight">
+              {form.image && !imgError ? (
+                <img
+                  src={form.image}
+                  alt="preview"
+                  onError={() => setImgError(true)}
+                  className="h-full w-full object-cover"
+                />
+              ) : (
+                <div className="flex flex-col items-center gap-2 text-alabaster/30">
+                  <ImageIcon className="h-6 w-6" strokeWidth={1.5} />
+                  <span className="font-sans text-[11px]">Live image preview</span>
+                </div>
+              )}
+            </div>
           </div>
 
           <Field label="Image URL" value={form.image} onChange={updateField('image')} required />
@@ -247,8 +249,10 @@ export default function AdminPage({
           <div className="flex flex-col gap-3">
             {exhibits.map((exhibit, i) => (
               <div key={exhibit.id} className="flex items-center gap-4 rounded-sm border border-frame bg-slate/30 p-3">
-                <div className="frame-heritage frame-sm flex h-16 w-16 shrink-0 items-center justify-center overflow-hidden rounded-sm bg-midnight">
-                  <ExhibitThumb exhibit={exhibit} />
+                <div className="frame-gilded frame-gilded-sm shrink-0">
+                  <div className="flex h-16 w-16 items-center justify-center overflow-hidden bg-midnight">
+                    <ExhibitThumb exhibit={exhibit} />
+                  </div>
                 </div>
                 <div className="min-w-0 flex-1">
                   <p className="truncate font-display text-sm text-parchment">
