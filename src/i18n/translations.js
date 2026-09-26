@@ -24,6 +24,7 @@ export const TRANSLATIONS = {
       contacts: 'Contacts', phone: 'Phone', email: 'Email', address: 'Address', social: 'Follow',
       tba: 'To be announced', museumLines: "Each museum's own phone number is listed on its exhibits.",
     },
+    cursor: { view: 'View' },
     accessGate: {
       kicker: 'Restricted Area',
       title: 'Access Verification',
@@ -52,6 +53,7 @@ export const TRANSLATIONS = {
       contacts: 'Контакты', phone: 'Телефон', email: 'Эл. почта', address: 'Адрес', social: 'Соцсети',
       tba: 'Скоро появится', museumLines: 'Телефон каждого музея указан на странице его экспонатов.',
     },
+    cursor: { view: 'Смотреть' },
     accessGate: {
       kicker: 'Закрытая зона',
       title: 'Проверка доступа',
@@ -80,6 +82,7 @@ export const TRANSLATIONS = {
       contacts: 'Kontaktlar', phone: 'Telefon', email: 'Elektron pochta', address: 'Manzil', social: 'Ijtimoiy tarmoqlar',
       tba: "Tez orada e'lon qilinadi", museumLines: "Har bir muzeyning telefon raqami uning eksponatlarida ko'rsatilgan.",
     },
+    cursor: { view: "Ko'rish" },
     accessGate: {
       kicker: 'Yopiq hudud',
       title: 'Kirishni tasdiqlash',

@@ -1,9 +1,12 @@
-import { useEffect, useRef, useState } from 'react'
+import { useCallback, useEffect, useRef, useState } from 'react'
 import {
   X, ZoomIn, ZoomOut, ChevronLeft, ChevronRight, Volume2, Pause, Ruler, MapPin, Landmark, Phone, UserRound,
 } from 'lucide-react'
 import { useLanguage } from '../i18n/LanguageContext'
 import { telHref } from '../utils/phone'
+import { useMotion } from '../motion/useMotion'
+import { gsap, depth, revealMedia } from '../motion/core'
+import { lockScroll } from '../motion/MotionLayer'
 
 const SPEECH_LANGS = { en: 'en-US', ru: 'ru-RU', uz: 'uz-UZ' }
 // Few browsers ship an Uzbek voice; Turkish pronounces Latin-script Uzbek far better than English.
@@ -113,15 +116,64 @@ export default function ExhibitModal({ exhibit, exhibits, onClose, onNavigate })
     if (speechSupported) window.speechSynthesis.getVoices()
   }, [])
 
+  const overlayRef = useRef(null)
+  const closingRef = useRef(false)
+  const firstExhibitRef = useRef(exhibit?.id)
+
+  // Stepping up to the artwork: the room dims, the panel swings forward from
+  // depth, the picture opens like an iris and the notes arrive one by one.
+  useMotion(overlayRef, (c, root) => {
+    const panel = root.querySelector('[data-modal-panel]')
+    const details = root.querySelector('[data-modal-details]').children
+    gsap.from(root, { autoAlpha: 0, duration: c.reduce ? 0.25 : 0.6, ease: 'power2.out' })
+    if (c.reduce) return
+    const k = depth(c)
+    gsap.from(panel, {
+      autoAlpha: 0, y: 80 * k, z: -320 * k, rotateX: 12 * k, transformPerspective: 1400, transformOrigin: '50% 100%',
+      duration: 1.3, ease: 'expo.out',
+    })
+    revealMedia(root.querySelector('[data-modal-art]'), null, c, { trigger: false, from: 'iris', delay: 0.15 })
+    gsap.from(details, { autoAlpha: 0, y: 28 * k, duration: 1.1, stagger: 0.06, delay: 0.25, ease: 'expo.out' })
+  })
+
+  // Moving to the previous/next work re-opens the picture and the notes.
+  useMotion(overlayRef, (c, root) => {
+    if (firstExhibitRef.current === exhibit?.id) return
+    firstExhibitRef.current = null
+    const details = root.querySelector('[data-modal-details]').children
+    if (c.reduce) { gsap.from(details, { autoAlpha: 0, duration: 0.3 }); return }
+    revealMedia(root.querySelector('[data-modal-art]'), null, c, { trigger: false, from: 'iris' })
+    gsap.from(details, { autoAlpha: 0, x: -24 * depth(c), duration: 0.9, stagger: 0.04, ease: 'expo.out' })
+  }, [exhibit?.id])
+
+  // Freeze the page behind the modal while it is open.
+  useEffect(() => {
+    lockScroll(true)
+    return () => lockScroll(false)
+  }, [])
+
+  // Closing plays the entrance in reverse before unmounting.
+  const requestClose = useCallback(() => {
+    if (closingRef.current) return
+    closingRef.current = true
+    const root = overlayRef.current
+    const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches
+    if (!root || reduce) { onClose(); return }
+    gsap.to(root.querySelector('[data-modal-panel]'), {
+      autoAlpha: 0, z: -220, rotateX: -8, y: 40, transformPerspective: 1400, duration: 0.45, ease: 'power3.in',
+    })
+    gsap.to(root, { autoAlpha: 0, duration: 0.5, ease: 'power2.in', onComplete: onClose })
+  }, [onClose])
+
   useEffect(() => {
     const handleKey = (e) => {
-      if (e.key === 'Escape') onClose()
+      if (e.key === 'Escape') requestClose()
       if (e.key === 'ArrowRight') onNavigate(1)
       if (e.key === 'ArrowLeft') onNavigate(-1)
     }
     window.addEventListener('keydown', handleKey)
     return () => window.removeEventListener('keydown', handleKey)
-  }, [onClose, onNavigate])
+  }, [requestClose, onNavigate])
 
   if (!exhibit) return null
 
@@ -129,22 +181,26 @@ export default function ExhibitModal({ exhibit, exhibits, onClose, onNavigate })
 
   return (
     <div
-      className="fixed inset-0 z-50 flex items-center justify-center bg-obsidian/90 p-3 backdrop-blur-md fade-in sm:p-6"
-      onClick={onClose}
+      ref={overlayRef}
+      data-lenis-prevent
+      className="fixed inset-0 z-50 flex items-center justify-center bg-obsidian/90 p-3 backdrop-blur-md sm:p-6"
+      onClick={requestClose}
     >
       <div
-        className="scale-in relative grid max-h-[92vh] w-full max-w-6xl grid-cols-1 overflow-hidden rounded-sm bg-midnight frame-heritage md:grid-cols-2"
+        data-modal-panel
+        className="relative grid max-h-[92vh] w-full max-w-6xl grid-cols-1 overflow-hidden rounded-sm bg-midnight frame-heritage md:grid-cols-2"
         onClick={(e) => e.stopPropagation()}
       >
         <button
-          onClick={onClose}
+          data-magnetic="0.4"
+          onClick={requestClose}
           className="absolute right-4 top-4 z-50 flex h-9 w-9 items-center justify-center rounded-full border border-gold/40 bg-obsidian/70 text-parchment transition-colors hover:bg-gold hover:text-obsidian"
         >
           <X className="h-4 w-4" strokeWidth={1.75} />
         </button>
 
         {/* LEFT: curatorial detail */}
-        <div className="order-2 flex max-h-[92vh] flex-col overflow-y-auto p-6 sm:p-8 md:order-1">
+        <div data-modal-details className="order-2 flex max-h-[92vh] flex-col overflow-y-auto p-6 sm:p-8 md:order-1">
           <span className="font-display text-xs tracking-widest text-gold">
             № {String(index + 1).padStart(2, '0')} · {exhibit.category}
           </span>
@@ -156,6 +212,7 @@ export default function ExhibitModal({ exhibit, exhibits, onClose, onNavigate })
           </p>
 
           <button
+            data-magnetic="0.25"
             onClick={audioPlaying ? stopAudio : playAudio}
             disabled={!speechSupported}
             title={speechSupported ? undefined : t.modal.audioUnsupported}
@@ -277,6 +334,7 @@ export default function ExhibitModal({ exhibit, exhibits, onClose, onNavigate })
 
           <div className="mt-8 flex items-center justify-between border-t border-frame pt-6">
             <button
+              data-magnetic="0.3"
               onClick={() => onNavigate(-1)}
               className="flex items-center gap-2 font-sans text-xs uppercase tracking-widest text-alabaster/70 transition-colors hover:text-gold-light"
             >
@@ -287,6 +345,7 @@ export default function ExhibitModal({ exhibit, exhibits, onClose, onNavigate })
               {index + 1} / {exhibits.length}
             </span>
             <button
+              data-magnetic="0.3"
               onClick={() => onNavigate(1)}
               className="flex items-center gap-2 font-sans text-xs uppercase tracking-widest text-alabaster/70 transition-colors hover:text-gold-light"
             >
@@ -299,7 +358,7 @@ export default function ExhibitModal({ exhibit, exhibits, onClose, onNavigate })
         {/* RIGHT: image, zoom, plaque */}
         <div className="frame-gilded frame-gilded-lg relative order-1 h-[42vh] overflow-hidden bg-midnight md:order-2 md:h-auto">
 
-          <div className="flex h-full w-full items-center justify-center overflow-hidden">
+          <div data-modal-art className="flex h-full w-full items-center justify-center overflow-hidden">
             {exhibit.image && !imgError ? (
               <img
                 src={exhibit.image}

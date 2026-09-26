@@ -209,24 +209,6 @@ body::after {
   }
 }
 
-@layer utilities {
-  .fade-in { animation: fadeIn 0.4s ease both; }
-  .scale-in { animation: scaleIn 0.35s cubic-bezier(0.16, 1, 0.3, 1) both; }
-  .slide-up { animation: slideUp 0.5s cubic-bezier(0.16, 1, 0.3, 1) both; }
-}
-
-@keyframes fadeIn {
-  from { opacity: 0; }
-  to { opacity: 1; }
-}
-@keyframes scaleIn {
-  from { opacity: 0; transform: scale(0.96); }
-  to { opacity: 1; transform: scale(1); }
-}
-@keyframes slideUp {
-  from { opacity: 0; transform: translateY(16px); }
-  to { opacity: 1; transform: translateY(0); }
-}
 /* Endless horizontal scroll for the museum filter chips. The track holds the
    list twice and slides by exactly one copy (-50%), so the loop is seamless.
    Hovering or focusing a chip pauses it so it can be clicked. */
@@ -255,4 +237,108 @@ body::after {
 }
 @media (prefers-reduced-motion: reduce) {
   .marquee-group { flex-wrap: wrap; justify-content: center; }
+}
+
+/* ───────────────────────── Motion system (see src/motion) ───────────────────────── */
+
+/* Lenis smooth scrolling */
+html.lenis, html.lenis body { height: auto; }
+.lenis.lenis-smooth { scroll-behavior: auto !important; }
+.lenis.lenis-smooth [data-lenis-prevent] { overscroll-behavior: contain; }
+.lenis.lenis-stopped, html.scroll-locked { overflow: hidden; }
+
+/* Media inside a revealing frame: zoom and parallax travel on the individual
+   `scale`/`translate` properties, so they compose with hover `transform`s. */
+.reveal-media {
+  scale: calc(var(--reveal-scale, 1) * var(--media-zoom, 1.12));
+  translate: 0 var(--parallax-y, 0%);
+  will-change: transform; /* its own compositor layer: parallax never repaints the frame */
+}
+
+/* Elements driven by GSAP must not also ease transform or opacity through CSS:
+   a CSS opacity transition makes GSAP read a mid-transition value as the end
+   state of an autoAlpha entrance, leaving the element invisible. */
+[data-magnetic], [data-tilt] {
+  transition-property: color, background-color, border-color, box-shadow;
+}
+[data-tilt] { transform-style: preserve-3d; will-change: transform; }
+
+/* Soft gallery spotlight that follows the cursor across a tilted artwork. */
+.tilt-sheen {
+  position: absolute;
+  inset: 0;
+  z-index: 25;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.6s ease;
+  background: radial-gradient(circle at var(--mx, 50%) var(--my, 50%), rgb(255 244 222 / 0.28), transparent 46%);
+  mix-blend-mode: soft-light;
+}
+.is-tilting .tilt-sheen { opacity: 1; }
+
+/* Cursor ring: a thin gilt circle that trails the pointer and opens over artworks. */
+.cursor-ring {
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 100;
+  width: 34px;
+  height: 34px;
+  border: 1px solid rgb(var(--color-gold) / 0.55);
+  border-radius: 9999px;
+  pointer-events: none;
+  opacity: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: width 0.45s cubic-bezier(0.16, 1, 0.3, 1), height 0.45s cubic-bezier(0.16, 1, 0.3, 1),
+    background-color 0.45s ease, border-color 0.45s ease, opacity 0.3s ease;
+}
+.cursor-ring.is-visible { opacity: 1; }
+.cursor-ring[data-mode='link'] { width: 50px; height: 50px; border-color: rgb(var(--color-gold) / 0.8); }
+.cursor-ring[data-mode='view'] {
+  width: 84px;
+  height: 84px;
+  background-color: rgb(var(--color-obsidian) / 0.55);
+  border-color: rgb(var(--color-gold) / 0.9);
+}
+.cursor-ring__label {
+  font-family: 'Cinzel', serif;
+  font-size: 10px;
+  letter-spacing: 0.25em;
+  text-transform: uppercase;
+  color: rgb(var(--color-gold-light));
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+.cursor-ring[data-mode='view'] .cursor-ring__label { opacity: 1; }
+@media (hover: none), (pointer: coarse), (max-width: 1023.98px), (prefers-reduced-motion: reduce) {
+  .cursor-ring { display: none; }
+}
+
+/* Architectural ornaments drifting at different depths behind the content. */
+.ambient-ornaments {
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  overflow: hidden;
+  color: rgb(var(--color-gold));
+  opacity: var(--ornament-opacity, 0.07);
+}
+:root.dark .ambient-ornaments { --ornament-opacity: 0.09; }
+.ambient-ornaments svg { width: 100%; height: 100%; stroke: currentColor; stroke-width: 1; vector-effect: non-scaling-stroke; }
+.ambient-ornaments svg * { vector-effect: non-scaling-stroke; }
+.ambient-ornaments > div { position: absolute; will-change: transform; }
+.ambient-ornaments__arch { left: 3vw; top: 38vh; width: min(24vw, 320px); height: min(48vw, 640px); }
+.ambient-ornaments__column { right: 4vw; top: 22vh; width: min(10vw, 150px); height: min(36vw, 520px); }
+.ambient-ornaments__medallion { right: 20vw; top: 6vh; width: min(30vmin, 340px); aspect-ratio: 1; }
+.ambient-ornaments__spin { transform-box: fill-box; transform-origin: center; animation: ornament-spin 240s linear infinite; }
+@keyframes ornament-spin { to { transform: rotate(360deg); } }
+@media (max-width: 1023.98px) {
+  .ambient-ornaments__column, .ambient-ornaments__medallion { display: none; }
+  .ambient-ornaments__arch { left: -6vw; width: 46vw; height: 92vw; opacity: 0.8; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .ambient-ornaments__spin { animation: none; }
 }

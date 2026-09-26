@@ -6,6 +6,8 @@ import AdminLogin from './components/AdminLogin'
 import UserPage from './pages/UserPage'
 import AdminPage from './pages/AdminPage'
 import CreatorsPage from './pages/CreatorsPage'
+import MotionLayer, { scrollToTop } from './motion/MotionLayer'
+import AmbientOrnaments from './motion/AmbientOrnaments'
 import {
   loadExhibits,
   createExhibit,
@@ -53,7 +55,7 @@ export default function App() {
   const navigate = (nextView) => {
     window.history.pushState({}, '', VIEW_PATHS[nextView] || '/')
     setView(nextView)
-    window.scrollTo({ top: 0 })
+    scrollToTop()
   }
 
   const refresh = async () => {
@@ -117,6 +119,8 @@ export default function App() {
 
   return (
     <div className="min-h-screen font-sans text-parchment">
+      <AmbientOrnaments />
+      <MotionLayer view={loading ? 'loading' : view} />
       <Navbar
         view={view}
         setView={navigate}

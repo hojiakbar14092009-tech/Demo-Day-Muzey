@@ -1,4 +1,7 @@
+import { useRef } from 'react'
 import { Landmark } from 'lucide-react'
+import { useMotion } from '../motion/useMotion'
+import { revealFrom } from '../motion/core'
 import { useLanguage } from '../i18n/LanguageContext'
 import { SITE_CONTACTS } from '../data/siteContacts'
 import { telHref } from '../utils/phone'
@@ -7,22 +10,30 @@ export default function Footer() {
   const { t } = useLanguage()
   const { phone, email, address, socials } = SITE_CONTACTS
   const activeSocials = socials.filter((s) => s.url)
+  const scope = useRef(null)
+
+  useMotion(scope, (c, root) => {
+    const q = (sel) => root.querySelectorAll(sel)
+    revealFrom(q('[data-colophon]'), 'drift', c, { trigger: root, start: 'top 95%', stagger: 0.12 })
+    revealFrom(q('[data-contacts-title]'), 'rise', c, { trigger: q('[data-contacts]')[0], start: 'top 95%' })
+    revealFrom(q('dl > div'), 'tilt', c, { trigger: q('[data-contacts]')[0], start: 'top 95%', stagger: 0.1, delay: 0.15 })
+  })
 
   return (
-    <footer className="rule-heritage bg-midnight">
+    <footer ref={scope} className="rule-heritage bg-midnight">
       <div className="mx-auto max-w-7xl px-6 py-12 sm:px-8">
         <div className="flex flex-col items-center gap-4 text-center">
-          <div className="flex items-center gap-2">
+          <div data-colophon className="flex items-center gap-2">
             <Landmark className="h-4 w-4 text-gold" strokeWidth={1.5} />
             <span className="font-display text-sm tracking-widest2 text-parchment">
               GRAND MUSÉE
             </span>
           </div>
-          <p className="max-w-md font-serif text-sm italic text-alabaster/50">
+          <p data-colophon className="max-w-md font-serif text-sm italic text-alabaster/50">
             A digital sanctuary uniting the Louvre, the Met, the British Museum, the Egyptian
             Museum, the Hermitage, the Vatican, and beyond.
           </p>
-          <div className="flex flex-wrap items-center justify-center gap-x-6 gap-y-2 font-sans text-[10px] uppercase tracking-[0.25em] text-alabaster/40">
+          <div data-colophon className="flex flex-wrap items-center justify-center gap-x-6 gap-y-2 font-sans text-[10px] uppercase tracking-[0.25em] text-alabaster/40">
             <span>Paris</span>
             <span className="h-1 w-1 rounded-full bg-gold/40" />
             <span>Cairo</span>
@@ -40,8 +51,9 @@ export default function Footer() {
             <span>Vatican City</span>
           </div>
 
-          <section aria-labelledby="footer-contacts" className="rule-heritage mt-6 w-full max-w-4xl pt-8">
+          <section data-contacts aria-labelledby="footer-contacts" className="rule-heritage mt-6 w-full max-w-4xl pt-8">
             <h2
+              data-contacts-title
               id="footer-contacts"
               className="font-display text-xs uppercase tracking-widest2 text-gold"
             >
