@@ -14,7 +14,7 @@ export default function ExhibitCard({ exhibit, index, size = 'normal', onOpen })
   return (
     <article
       onClick={() => onOpen(exhibit)}
-      className={`group relative cursor-pointer overflow-hidden rounded-sm border border-frame bg-slate ${ASPECT[size]} slide-up`}
+      className={`frame-heritage group relative cursor-pointer overflow-hidden rounded-sm bg-slate ${ASPECT[size]} slide-up`}
       style={{ animationDelay: `${Math.min(index, 10) * 60}ms` }}
     >
       <div className="absolute left-3 top-3 z-20 flex items-center gap-1.5 rounded-full border border-gold/40 bg-obsidian/70 px-2.5 py-1 backdrop-blur-sm">

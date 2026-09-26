@@ -132,7 +132,7 @@ export default function ExhibitModal({ exhibit, exhibits, onClose, onNavigate })
       onClick={onClose}
     >
       <div
-        className="scale-in relative grid max-h-[92vh] w-full max-w-6xl grid-cols-1 overflow-hidden rounded-sm border border-gold/30 bg-midnight shadow-gilded md:grid-cols-2"
+        className="scale-in relative grid max-h-[92vh] w-full max-w-6xl grid-cols-1 overflow-hidden rounded-sm bg-midnight frame-heritage md:grid-cols-2"
         onClick={(e) => e.stopPropagation()}
       >
         <button
@@ -248,7 +248,7 @@ export default function ExhibitModal({ exhibit, exhibits, onClose, onNavigate })
                 {t.modal.aboutArtist}
               </p>
               <div className="mt-4 flex flex-col gap-5 sm:flex-row sm:items-start">
-                <div className="flex aspect-[3/4] w-full max-w-[15rem] shrink-0 items-center justify-center self-center overflow-hidden rounded-sm border border-gold/40 bg-obsidian shadow-gilded sm:w-52 sm:self-start">
+                <div className="flex aspect-[3/4] w-full max-w-[15rem] shrink-0 items-center justify-center self-center overflow-hidden rounded-sm bg-midnight frame-heritage sm:w-52 sm:self-start">
                   {exhibit.artistImage && !artistImgError ? (
                     <img
                       src={exhibit.artistImage}
@@ -294,8 +294,7 @@ export default function ExhibitModal({ exhibit, exhibits, onClose, onNavigate })
         </div>
 
         {/* RIGHT: image, zoom, plaque */}
-        <div className="relative order-1 h-[42vh] overflow-hidden bg-obsidian md:order-2 md:h-auto">
-          <div className="pointer-events-none absolute inset-0 z-10 bg-[radial-gradient(circle_at_50%_20%,rgba(243,211,140,0.16),transparent_60%)]" />
+        <div className="frame-inset relative order-1 h-[42vh] overflow-hidden bg-obsidian md:order-2 md:h-auto">
 
           <div className="flex h-full w-full items-center justify-center overflow-hidden">
             {exhibit.image && !imgError ? (

@@ -2,7 +2,7 @@ import { Landmark } from 'lucide-react'
 
 export default function Footer() {
   return (
-    <footer className="border-t border-frame bg-midnight">
+    <footer className="rule-heritage bg-midnight">
       <div className="mx-auto max-w-7xl px-6 py-12 sm:px-8">
         <div className="flex flex-col items-center gap-4 text-center">
           <div className="flex items-center gap-2">

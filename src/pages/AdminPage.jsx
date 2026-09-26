@@ -156,7 +156,7 @@ export default function AdminPage({
             )}
           </div>
 
-          <div className="flex h-40 w-full items-center justify-center overflow-hidden rounded-md border border-frame bg-obsidian/60">
+          <div className="frame-heritage frame-sm flex h-40 w-full items-center justify-center overflow-hidden rounded-sm bg-midnight">
             {form.image && !imgError ? (
               <img
                 src={form.image}
@@ -247,7 +247,7 @@ export default function AdminPage({
           <div className="flex flex-col gap-3">
             {exhibits.map((exhibit, i) => (
               <div key={exhibit.id} className="flex items-center gap-4 rounded-sm border border-frame bg-slate/30 p-3">
-                <div className="flex h-16 w-16 shrink-0 items-center justify-center overflow-hidden rounded-sm border border-frame bg-obsidian">
+                <div className="frame-heritage frame-sm flex h-16 w-16 shrink-0 items-center justify-center overflow-hidden rounded-sm bg-midnight">
                   <ExhibitThumb exhibit={exhibit} />
                 </div>
                 <div className="min-w-0 flex-1">

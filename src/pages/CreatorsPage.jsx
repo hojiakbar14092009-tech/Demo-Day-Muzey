@@ -40,17 +40,20 @@ export default function CreatorsPage({ exhibits }) {
         </p>
       </div>
 
-      <div className="flex flex-col gap-10">
-        {creators.map((creator, i) => (
-          <CreatorCard
-            key={creator.key}
-            creator={creator}
-            lang={lang}
-            worksLabel={t.creators.works}
-            reversed={i % 2 === 1}
-            onOpenWork={setSelected}
-          />
-        ))}
+      <div className="card-heritage px-5 py-8 sm:px-10 sm:py-12">
+        <div className="relative flex flex-col">
+          {creators.map((creator, i) => (
+            <CreatorCard
+              key={creator.key}
+              creator={creator}
+              lang={lang}
+              worksLabel={t.creators.works}
+              reversed={i % 2 === 1}
+              divided={i > 0}
+              onOpenWork={setSelected}
+            />
+          ))}
+        </div>
       </div>
 
       {selected && (
@@ -65,17 +68,17 @@ export default function CreatorsPage({ exhibits }) {
   )
 }
 
-function CreatorCard({ creator, lang, worksLabel, reversed, onOpenWork }) {
+function CreatorCard({ creator, lang, worksLabel, reversed, divided, onOpenWork }) {
   const [imgError, setImgError] = useState(false)
   const pick = (field) => field?.[lang] || field?.en || ''
 
   return (
     <article
-      className={`slide-up flex flex-col gap-6 rounded-sm border border-frame bg-slate/30 p-5 sm:p-8 md:flex-row md:gap-10 ${
-        reversed ? 'md:flex-row-reverse' : ''
+      className={`slide-up flex flex-col gap-6 py-8 sm:py-10 md:flex-row md:gap-12 ${reversed ? 'md:flex-row-reverse' : ''} ${
+        divided ? 'rule-heritage' : 'pt-2 sm:pt-2'
       }`}
     >
-      <div className="flex aspect-[3/4] w-full max-w-xs shrink-0 items-center justify-center self-center overflow-hidden rounded-sm border border-gold/40 bg-obsidian shadow-gilded md:w-72 md:self-start">
+      <div className="flex aspect-[3/4] w-full max-w-xs shrink-0 items-center justify-center self-center overflow-hidden rounded-sm bg-midnight frame-heritage md:w-72 md:self-start">
         {creator.image && !imgError ? (
           <img
             src={creator.image}
@@ -117,7 +120,7 @@ function WorkChip({ work, onOpen }) {
       onClick={() => onOpen(work)}
       className="group flex items-center gap-3 rounded-sm border border-frame bg-obsidian/60 p-2 pr-4 text-left transition-colors hover:border-gold"
     >
-      <span className="flex h-14 w-14 shrink-0 items-center justify-center overflow-hidden rounded-sm bg-midnight">
+      <span className="frame-heritage frame-sm flex h-14 w-14 shrink-0 items-center justify-center overflow-hidden rounded-sm bg-midnight">
         {work.image && !imgError ? (
           <img
             src={work.image}

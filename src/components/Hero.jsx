@@ -1,20 +1,16 @@
-import { Sparkles } from 'lucide-react'
-
 export default function Hero({ exhibitCount, museumCount }) {
   return (
-    <section className="relative overflow-hidden border-b border-frame bg-radial-fade bg-noise">
-      <div className="pointer-events-none absolute inset-0 bg-gradient-to-b from-transparent via-transparent to-obsidian" />
+    <section className="relative overflow-hidden border-b border-frame">
       <div className="relative mx-auto max-w-5xl px-6 py-20 text-center sm:py-28">
         <div className="mb-6 flex items-center justify-center gap-3 text-gold">
           <span className="h-px w-10 bg-gold/50" />
-          <Sparkles className="h-4 w-4" strokeWidth={1.5} />
           <span className="font-sans text-[11px] uppercase tracking-[0.4em]">
             A Curated World Collection
           </span>
           <span className="h-px w-10 bg-gold/50" />
         </div>
 
-        <h1 className="text-shadow-gold font-display text-4xl leading-tight text-parchment sm:text-6xl">
+        <h1 className="font-display text-4xl leading-tight text-parchment sm:text-6xl">
           The Grand Musée
         </h1>
 

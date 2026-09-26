@@ -126,7 +126,7 @@ export default function App() {
   }
 
   return (
-    <div className="min-h-screen bg-obsidian font-sans text-parchment">
+    <div className="min-h-screen font-sans text-parchment">
       <Navbar
         view={view}
         setView={navigate}

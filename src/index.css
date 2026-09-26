@@ -2,40 +2,55 @@
 @tailwind components;
 @tailwind utilities;
 
-/* Dark theme (default) */
+/* Heritage palette. Every Tailwind color reads one of these channels, so the
+   whole site changes theme by swapping this block.
+   Light (default): warm ivory paper, espresso ink, antique bronze accents.
+   Dark: deep forest green, olive hairlines, muted antique gold. */
 :root {
-  --color-obsidian: 11 13 17;
-  --color-midnight: 16 20 27;
-  --color-slate: 21 25 34;
-  --color-parchment: 244 241 234;
-  --color-alabaster: 226 223 215;
-  --color-frame: 38 45 61;
-  --color-gold: 197 160 89;
-  --color-gold-light: 243 211 140;
-  --color-gold-dark: 143 108 44;
-  --color-ink: 11 13 17;
+  --color-obsidian: 245 240 229;   /* page — warm ivory */
+  --color-midnight: 237 230 214;   /* secondary surfaces — parchment */
+  --color-slate: 251 248 241;      /* cards — cream */
+  --color-parchment: 44 34 25;     /* primary text — espresso */
+  --color-alabaster: 86 74 60;     /* secondary text — warm umber */
+  --color-frame: 212 200 176;      /* hairlines — muted beige */
+  --color-gold: 138 108 58;        /* antique bronze */
+  --color-gold-light: 110 84 40;   /* accent text — deep brass */
+  --color-gold-dark: 84 66 36;
+  --color-ink: 251 248 241;        /* text on bronze fills */
+  --color-vignette: 110 86 52;
+  --vignette-strength: 0.10;
+  --shadow-soft: 0 1px 2px rgb(44 34 25 / 0.06), 0 14px 30px -18px rgb(44 34 25 / 0.35);
+  color-scheme: light;
 }
 
-/* Light theme, toggled by adding .light to <html> */
-:root.light {
-  --color-obsidian: 250 248 244;
-  --color-midnight: 240 235 224;
-  --color-slate: 255 255 255;
-  --color-parchment: 26 23 18;
-  --color-alabaster: 74 69 60;
-  --color-frame: 222 214 198;
-  --color-gold: 163 121 58;
-  --color-gold-light: 138 95 36;
-  --color-gold-dark: 90 64 24;
-  --color-ink: 11 13 17;
+:root.dark {
+  --color-obsidian: 22 28 23;      /* page — deep forest */
+  --color-midnight: 28 35 29;      /* secondary surfaces */
+  --color-slate: 33 41 34;         /* cards — dark olive */
+  --color-parchment: 240 233 218;  /* primary text — ivory */
+  --color-alabaster: 212 203 184;  /* secondary text — linen */
+  --color-frame: 62 70 56;         /* hairlines — olive */
+  --color-gold: 176 147 94;        /* muted antique gold */
+  --color-gold-light: 214 188 136;
+  --color-gold-dark: 122 98 58;
+  --color-ink: 24 22 16;
+  --color-vignette: 0 0 0;
+  --vignette-strength: 0.35;
+  --shadow-soft: 0 1px 2px rgb(0 0 0 / 0.25), 0 16px 34px -18px rgb(0 0 0 / 0.7);
+  color-scheme: dark;
 }
 
 html {
   scroll-behavior: smooth;
 }
 
+/* Paper: a faint fractal grain plus a soft vignette — no repeating motif. */
 body {
   background-color: rgb(var(--color-obsidian));
+  background-image:
+    radial-gradient(ellipse at center, transparent 55%, rgb(var(--color-vignette) / var(--vignette-strength)) 100%),
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='g'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 .35 0 0 0 0 .27 0 0 0 0 .17 0 0 0 .55 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23g)' opacity='.22'/%3E%3C/svg%3E");
+  background-attachment: fixed, scroll;
   color: rgb(var(--color-parchment));
   transition: background-color 0.2s ease, color 0.2s ease;
 }
@@ -61,14 +76,57 @@ body {
   background: rgb(var(--color-gold-dark));
 }
 
+/* Heritage framing — reusable, restrained, drawn with borders and shadows only. */
+@layer components {
+  /* Gallery frame: hairline bronze edge, a narrow cream mat, a second hairline.
+     Drawn entirely with box-shadow rings, so it never changes layout size.
+     Tune the mat with --mat (default 5px); parents need that much room. */
+  .frame-heritage {
+    --mat: 5px;
+    box-shadow:
+      0 0 0 1px rgb(var(--color-gold) / 0.55),
+      0 0 0 var(--mat) rgb(var(--color-slate)),
+      0 0 0 calc(var(--mat) + 1px) rgb(var(--color-gold) / 0.35),
+      var(--shadow-soft);
+  }
+  .frame-sm { --mat: 3px; }
+
+  /* Inner frame for large image panels that sit flush inside a container. */
+  .frame-inset { position: relative; }
+  .frame-inset::after {
+    content: '';
+    position: absolute;
+    inset: 12px;
+    z-index: 15;
+    pointer-events: none;
+    border: 1px solid rgb(var(--color-slate) / 0.7);
+    outline: 1px solid rgb(var(--color-gold) / 0.45);
+    outline-offset: 3px;
+  }
+
+  /* Heritage card: thin bronze border with a quiet inner rule. */
+  .card-heritage {
+    position: relative;
+    background-color: rgb(var(--color-slate));
+    border: 1px solid rgb(var(--color-gold) / 0.45);
+    box-shadow: var(--shadow-soft);
+  }
+  .card-heritage::before {
+    content: '';
+    position: absolute;
+    inset: 6px;
+    pointer-events: none;
+    border: 1px solid rgb(var(--color-frame));
+  }
+
+  /* Double hairline rule for section edges. */
+  .rule-heritage {
+    border-top: 1px solid rgb(var(--color-frame));
+    box-shadow: inset 0 4px 0 -3px rgb(var(--color-gold) / 0.35);
+  }
+}
+
 @layer utilities {
-  .text-shadow-gold {
-    text-shadow: 0 0 30px rgb(var(--color-gold) / 0.25);
-  }
-  .bg-noise {
-    background-image: radial-gradient(rgb(var(--color-gold) / 0.06) 1px, transparent 1px);
-    background-size: 3px 3px;
-  }
   .fade-in { animation: fadeIn 0.4s ease both; }
   .scale-in { animation: scaleIn 0.35s cubic-bezier(0.16, 1, 0.3, 1) both; }
   .slide-up { animation: slideUp 0.5s cubic-bezier(0.16, 1, 0.3, 1) both; }
