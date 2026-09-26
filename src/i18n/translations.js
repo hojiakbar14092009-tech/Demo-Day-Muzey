@@ -20,6 +20,10 @@ export const TRANSLATIONS = {
       location: 'Provenance & Current Location', phone: 'Museum Phone', aboutArtist: 'About the Creator',
       previous: 'Previous', next: 'Next',
     },
+    footer: {
+      contacts: 'Contacts', phone: 'Phone', email: 'Email', address: 'Address', social: 'Follow',
+      tba: 'To be announced', museumLines: "Each museum's own phone number is listed on its exhibits.",
+    },
     accessGate: {
       kicker: 'Restricted Area',
       title: 'Access Verification',
@@ -44,6 +48,10 @@ export const TRANSLATIONS = {
       location: 'Происхождение и местонахождение', phone: 'Телефон музея', aboutArtist: 'Об авторе',
       previous: 'Назад', next: 'Далее',
     },
+    footer: {
+      contacts: 'Контакты', phone: 'Телефон', email: 'Эл. почта', address: 'Адрес', social: 'Соцсети',
+      tba: 'Скоро появится', museumLines: 'Телефон каждого музея указан на странице его экспонатов.',
+    },
     accessGate: {
       kicker: 'Закрытая зона',
       title: 'Проверка доступа',
@@ -67,6 +75,10 @@ export const TRANSLATIONS = {
       history: 'Tarixiy hikoya', dimensions: "O'lchamlari", medium: 'Material va texnika',
       location: 'Kelib chiqishi va hozirgi joyi', phone: 'Muzey telefoni', aboutArtist: 'Muallif haqida',
       previous: 'Oldingi', next: 'Keyingi',
+    },
+    footer: {
+      contacts: 'Kontaktlar', phone: 'Telefon', email: 'Elektron pochta', address: 'Manzil', social: 'Ijtimoiy tarmoqlar',
+      tba: "Tez orada e'lon qilinadi", museumLines: "Har bir muzeyning telefon raqami uning eksponatlarida ko'rsatilgan.",
     },
     accessGate: {
       kicker: 'Yopiq hudud',

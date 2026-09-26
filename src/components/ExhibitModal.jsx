@@ -3,6 +3,7 @@ import {
   X, ZoomIn, ZoomOut, ChevronLeft, ChevronRight, Volume2, Pause, Ruler, MapPin, Landmark, Phone, UserRound,
 } from 'lucide-react'
 import { useLanguage } from '../i18n/LanguageContext'
+import { telHref } from '../utils/phone'
 
 const SPEECH_LANGS = { en: 'en-US', ru: 'ru-RU', uz: 'uz-UZ' }
 // Few browsers ship an Uzbek voice; Turkish pronounces Latin-script Uzbek far better than English.
@@ -232,7 +233,7 @@ export default function ExhibitModal({ exhibit, exhibits, onClose, onNavigate })
                     {t.modal.phone}
                   </p>
                   <a
-                    href={`tel:${exhibit.museumPhone.replace(/[^d+]/g, '')}`}
+                    href={telHref(exhibit.museumPhone)}
                     className="font-sans text-sm text-gold-light underline-offset-4 hover:underline"
                   >
                     {exhibit.museumPhone}
