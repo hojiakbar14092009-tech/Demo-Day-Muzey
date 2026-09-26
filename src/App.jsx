@@ -17,7 +17,7 @@ import {
 } from './utils/api'
 import { resolveExhibitImages } from './utils/wikiImage'
 import { useLanguage } from './i18n/LanguageContext'
-import { localizeExhibit, TEXT_FIELDS } from './data/exhibits'
+import { localizeExhibit, applyFormToI18n } from './data/exhibits'
 
 const VIEW_PATHS = { user: '/', creators: '/creators', admin: '/admin' }
 const pathToView = (pathname) => {
@@ -66,7 +66,7 @@ export default function App() {
   }
 
   const handleCreate = async (form) => {
-    const created = await createExhibit(form)
+    const created = await createExhibit(applyFormToI18n(form, lang))
     setExhibits((prev) => [...prev, created])
   }
 
@@ -76,17 +76,7 @@ export default function App() {
   )
 
   const handleUpdate = async (id, form) => {
-    // Admin edits the current language's text; store it back into i18n so it isn't overridden.
-    const payload = form.i18n
-      ? {
-          ...form,
-          i18n: {
-            ...form.i18n,
-            [lang]: Object.fromEntries(TEXT_FIELDS.map((key) => [key, form[key]])),
-          },
-        }
-      : form
-    const updated = await updateExhibit(id, payload)
+    const updated = await updateExhibit(id, applyFormToI18n(form, lang))
     setExhibits((prev) => prev.map((ex) => (ex.id === id ? updated : ex)))
   }
 

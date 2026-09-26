@@ -20,6 +20,15 @@ export const TEXT_FIELDS = [
   'location', 'room', 'highlight', 'description', 'history', 'artistBio',
 ]
 
+/**
+ * The admin form edits the flat fields in the current language; copy them into
+ * `i18n[lang]` so they are not overridden by the stored translation.
+ */
+export const applyFormToI18n = (form, lang) =>
+  form.i18n
+    ? { ...form, i18n: { ...form.i18n, [lang]: Object.fromEntries(TEXT_FIELDS.map((key) => [key, form[key]])) } }
+    : form
+
 /** Returns the exhibit with its text fields in `lang` (falls back to English). */
 export const localizeExhibit = (exhibit, lang) => {
   if (!exhibit.i18n) return exhibit

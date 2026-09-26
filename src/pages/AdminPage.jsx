@@ -1,15 +1,40 @@
 import { useState } from 'react'
 import {
   Plus, Pencil, Trash2, RotateCcw, Save, X, Image as ImageIcon, Database, CheckCircle2, AlertCircle, Landmark,
+  BookOpen, Loader2,
 } from 'lucide-react'
-import { MUSEUMS, CATEGORIES } from '../data/exhibits'
+import { MUSEUMS, CATEGORIES, TEXT_FIELDS } from '../data/exhibits'
 import { DEFAULT_API_URL } from '../utils/api'
+import { fetchExhibitFromWikipedia } from '../utils/wikiAutofill'
+import { useLanguage } from '../i18n/LanguageContext'
+import { LANGUAGES } from '../i18n/translations'
 
 const EMPTY_FORM = {
   title: '', artist: '', year: '', period: '', museum: MUSEUMS[0], museumFull: '',
   category: CATEGORIES[0], dimensions: '', medium: '', location: '', room: '',
   image: '', highlight: '', description: '', history: '',
   museumPhone: '', artistImage: '', artistBio: '',
+}
+
+const hasText = (value) => typeof value === 'string' && value.trim() !== ''
+const pickFilled = (current, incoming) => (hasText(current) ? current : incoming || current)
+
+/**
+ * Merges a Wikipedia draft into the form without overwriting anything the
+ * admin already typed — except the title, which becomes the canonical name.
+ */
+function applyDraft(form, draft, lang) {
+  const text = draft.i18n[lang] || draft.i18n.en
+  const next = { ...form, category: draft.category, museum: draft.museum || form.museum }
+  for (const key of TEXT_FIELDS) next[key] = key === 'title' ? text.title : pickFilled(form[key], text[key])
+  for (const key of ['image', 'artistImage', 'museumPhone', 'wikiTitle']) next[key] = pickFilled(form[key], draft[key])
+  next.i18n = Object.fromEntries(
+    LANGUAGES.map((l) => [
+      l,
+      Object.fromEntries(TEXT_FIELDS.map((key) => [key, pickFilled(form.i18n?.[l]?.[key], draft.i18n[l]?.[key])])),
+    ])
+  )
+  return next
 }
 
 export default function AdminPage({
@@ -21,6 +46,8 @@ export default function AdminPage({
   const [imgError, setImgError] = useState(false)
   const [busy, setBusy] = useState(false)
   const [notice, setNotice] = useState(null)
+  const [lookup, setLookup] = useState({ status: 'idle' })
+  const { lang } = useLanguage()
 
   const updateField = (field) => (e) => {
     setForm((f) => ({ ...f, [field]: e.target.value }))
@@ -38,6 +65,25 @@ export default function AdminPage({
     setEditingId(null)
     setForm(EMPTY_FORM)
     setImgError(false)
+    setLookup({ status: 'idle' })
+  }
+
+  const handleLookup = async () => {
+    const query = form.title.trim()
+    if (!query) return
+    setLookup({ status: 'loading' })
+    try {
+      const draft = await fetchExhibitFromWikipedia(query, lang)
+      if (!draft) {
+        setLookup({ status: 'error', text: `Nothing found on Wikipedia for “${query}”.` })
+        return
+      }
+      setForm((f) => applyDraft(f, draft, lang))
+      setImgError(false)
+      setLookup({ status: 'done', sources: draft.sources })
+    } catch {
+      setLookup({ status: 'error', text: 'Wikipedia could not be reached — check your connection and try again.' })
+    }
   }
 
   const handleSubmit = async (e) => {
@@ -156,6 +202,36 @@ export default function AdminPage({
             )}
           </div>
 
+          <div className="flex flex-col gap-1">
+            <span className="font-sans text-[10px] uppercase tracking-widest text-alabaster/50">Title</span>
+            <div className="flex flex-col gap-2 sm:flex-row">
+              <input
+                value={form.title}
+                onChange={updateField('title')}
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter') { e.preventDefault(); handleLookup() }
+                }}
+                required
+                placeholder="e.g. Mona Lisa, The Kiss"
+                className="min-w-0 flex-1 rounded-md border border-frame bg-obsidian/60 px-3 py-2 font-sans text-sm text-parchment placeholder:text-alabaster/30 focus:border-gold focus:outline-none"
+              />
+              <button
+                type="button"
+                onClick={handleLookup}
+                disabled={!form.title.trim() || lookup.status === 'loading'}
+                className="flex shrink-0 items-center justify-center gap-2 rounded-md border border-gold/60 px-3 py-2 font-sans text-[11px] uppercase tracking-widest text-gold-light transition-colors hover:bg-gold hover:text-ink disabled:cursor-not-allowed disabled:opacity-40"
+              >
+                {lookup.status === 'loading' ? (
+                  <Loader2 className="h-3.5 w-3.5 animate-spin" strokeWidth={2} />
+                ) : (
+                  <BookOpen className="h-3.5 w-3.5" strokeWidth={1.75} />
+                )}
+                Fill from Wikipedia
+              </button>
+            </div>
+            <LookupStatus lookup={lookup} />
+          </div>
+
           <div className="frame-gilded frame-gilded-md">
             <div className="flex h-40 w-full items-center justify-center overflow-hidden bg-midnight">
               {form.image && !imgError ? (
@@ -176,13 +252,10 @@ export default function AdminPage({
 
           <Field label="Image URL" value={form.image} onChange={updateField('image')} required />
           <div className="grid grid-cols-2 gap-3">
-            <Field label="Title" value={form.title} onChange={updateField('title')} required />
             <Field label="Artist" value={form.artist} onChange={updateField('artist')} required />
-          </div>
-          <div className="grid grid-cols-2 gap-3">
             <Field label="Year" value={form.year} onChange={updateField('year')} />
-            <Field label="Period" value={form.period} onChange={updateField('period')} />
           </div>
+          <Field label="Period" value={form.period} onChange={updateField('period')} />
 
           <div className="grid grid-cols-2 gap-3">
             <SelectField label="Museum" value={form.museum} onChange={updateField('museum')} options={MUSEUMS} />
@@ -285,6 +358,39 @@ export default function AdminPage({
         </div>
       </div>
     </div>
+  )
+}
+
+function LookupStatus({ lookup }) {
+  if (lookup.status === 'loading') {
+    return <p className="font-sans text-xs text-alabaster/60">Searching Wikipedia and Wikidata…</p>
+  }
+  if (lookup.status === 'error') {
+    return (
+      <p className="flex items-center gap-1.5 font-sans text-xs text-red-300">
+        <AlertCircle className="h-3.5 w-3.5 shrink-0" strokeWidth={2} />
+        {lookup.text}
+      </p>
+    )
+  }
+  if (lookup.status === 'done') {
+    return (
+      <p className="flex flex-wrap items-center gap-1.5 font-sans text-xs text-emerald-400/90">
+        <CheckCircle2 className="h-3.5 w-3.5 shrink-0" strokeWidth={2} />
+        Filled from Wikipedia
+        {Object.entries(lookup.sources).map(([l, url]) => (
+          <a key={l} href={url} target="_blank" rel="noreferrer" className="uppercase text-gold-light underline-offset-2 hover:underline">
+            {l}
+          </a>
+        ))}
+        <span className="text-alabaster/50">— review the fields before saving.</span>
+      </p>
+    )
+  }
+  return (
+    <p className="font-sans text-xs text-alabaster/40">
+      Type an artwork's name and press Fill to load its image, text and creator in all three languages.
+    </p>
   )
 }
 
